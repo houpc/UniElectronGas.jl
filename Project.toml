@@ -1,0 +1,13 @@
+name = "UEG"
+uuid = "08068c49-ed33-44e0-8660-f015d3fbc7dd"
+authors = ["Pengcheng Hou"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.9"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
