@@ -1,6 +1,6 @@
-using UEG
+using UniElectronGas
 using Test
 
-@testset "UEG.jl" begin
+@testset "UniElectronGas.jl" begin
     # Write your tests here.
 end

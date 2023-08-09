@@ -1,16 +1,16 @@
-using UEG
+using UniElectronGas
 using Documenter
 
-DocMeta.setdocmeta!(UEG, :DocTestSetup, :(using UEG); recursive=true)
+DocMeta.setdocmeta!(UniElectronGas, :DocTestSetup, :(using UniElectronGas); recursive=true)
 
 makedocs(;
-    modules=[UEG],
+    modules=[UniElectronGas],
     authors="Pengcheng Hou",
-    repo="https://github.com/houpc/UEG.jl/blob/{commit}{path}#{line}",
-    sitename="UEG.jl",
+    repo="https://github.com/houpc/UniElectronGas.jl/blob/{commit}{path}#{line}",
+    sitename="UniElectronGas.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://houpc.github.io/UEG.jl",
+        canonical="https://houpc.github.io/UniElectronGas.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -20,6 +20,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/houpc/UEG.jl",
+    repo="github.com/houpc/UniElectronGas.jl",
     devbranch="main",
 )

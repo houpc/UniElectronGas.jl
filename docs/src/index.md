@@ -1,14 +1,14 @@
 ```@meta
-CurrentModule = UEG
+CurrentModule = UniElectronGas
 ```
 
-# UEG
+# UniElectronGas
 
-Documentation for [UEG](https://github.com/houpc/UEG.jl).
+Documentation for [UniElectronGas](https://github.com/houpc/UniElectronGas.jl).
 
 ```@index
 ```
 
 ```@autodocs
-Modules = [UEG]
+Modules = [UniElectronGas]
 ```

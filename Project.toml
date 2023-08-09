@@ -1,7 +1,20 @@
-name = "UEG"
+name = "UniElectronGas"
 uuid = "08068c49-ed33-44e0-8660-f015d3fbc7dd"
 authors = ["Pengcheng Hou"]
 version = "1.0.0-DEV"
+
+[deps]
+CompositeGrids = "b5136c89-beeb-4521-9139-60d2cac8be56"
+ElectronGas = "8c98e03e-8755-48b1-a5ef-1e2e7812a7c9"
+ElectronLiquid = "fe3a0b7f-0e79-43cc-aa0f-33de5212abe5"
+FeynmanDiagram = "e424a512-dbd9-41ff-9883-094748823e72"
+GreenFunc = "9efc7ea6-d529-4241-ab29-dcf68b94af7c"
+JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
+Lehmann = "95bf888a-8996-4655-9f35-1c0506bdfefe"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+MCIntegration = "ea1e2de9-7db7-4b42-91ee-0cd1bf6df167"
+Measurements = "eff96d63-e80a-5855-80a2-b1b0885c5ab7"
+TaylorSeries = "6aa5eb33-94cf-58f4-a9d0-e4b2c4fc25ea"
 
 [compat]
 julia = "1.9"
