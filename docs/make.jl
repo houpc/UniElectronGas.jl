@@ -11,15 +11,15 @@ makedocs(;
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://houpc.github.io/UniElectronGas.jl",
-        edit_link="main",
-        assets=String[],
+        # edit_link="main",
+        assets=String[]
     ),
     pages=[
         "Home" => "index.md",
-    ],
+    ]
 )
 
 deploydocs(;
     repo="github.com/houpc/UniElectronGas.jl",
-    devbranch="main",
+    devbranch="master"
 )
