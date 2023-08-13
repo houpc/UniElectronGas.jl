@@ -6,7 +6,7 @@ rs = [4.0,]
 mass2 = [0.5,]
 Fs = [-0.0,]
 beta = [25.0,]
-order = [5,]
+order = [4,]
 isDynamic = false
 
 const parafilename = "para_wn_1minus0.csv"

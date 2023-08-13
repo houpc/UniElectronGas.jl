@@ -6,9 +6,9 @@ rs = [4.0,]
 mass2 = [0.5,]
 Fs = [-0.0,]
 beta = [25.0,]
-order = [5,]
+order = [4,]
 isDynamic = false
-# dSigma/dk = (Sigma[kF_label+idx_dk] - Sigma[kF_label-idx_dk]) / (kgrid[kF_label+idx_dk] - kgrid[kF_label-idx_dk])
+### dSigma/dk = (Sigma[kF_label+idx_dk] - Sigma[kF_label-idx_dk]) / (kgrid[kF_label+idx_dk] - kgrid[kF_label-idx_dk])
 idx_dk = 1
 
 const parafilename = "para_wn_1minus0.csv"
@@ -23,9 +23,9 @@ if abspath(PROGRAM_FILE) == @__FILE__
         for key in keys(f)
             loadpara = ParaMC(key)
             if UEG.paraid(loadpara) == UEG.paraid(para)
-                meff = getMeff(para, filename, idx_dk)
+                meff = UniElectronGas.getMeff(para, filename, idx_dk)
                 println(UEG.paraid(para))
-                println("meff: ", meff)
+                println("m* / m = ", meff)
             end
         end
     end
