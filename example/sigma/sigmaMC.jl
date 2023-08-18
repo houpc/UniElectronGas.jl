@@ -45,7 +45,7 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     for (order, sOrder, vOrder) in partition
         push!(reweight_goal, 2.0^(2order + sOrder + vOrder - 2))
     end
-    push!(reweight_goal, 2.0)
+    push!(reweight_goal, 4.0)
 
     if diagGenerate == :GV
         diagram = Sigma.diagramGV(para, partition)
@@ -62,16 +62,16 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     end
 
     if isnothing(sigma) == false
-        # if isnothing(filename) == false
-        #     jldopen(filename, "a+") do f
-        #         key = "$(UEG.short(para))"
-        #         if haskey(f, key)
-        #             @warn("replacing existing data for $key")
-        #             delete!(f, key)
-        #         end
-        #         f[key] = (ngrid, kgrid, sigma)
-        #     end
-        # end
+        if isnothing(filename) == false
+            jldopen(filename, "a+") do f
+                key = "$(UEG.short(para))"
+                if haskey(f, key)
+                    @warn("replacing existing data for $key")
+                    delete!(f, key)
+                end
+                f[key] = (ngrid, kgrid, sigma)
+            end
+        end
         for (ip, key) in enumerate(partition)
             println("Group ", key)
             @printf("%10s  %10s   %10s   %10s   %10s \n", "q/kF", "real(avg)", "err", "imag(avg)", "err")

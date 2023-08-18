@@ -15,6 +15,7 @@ LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MCIntegration = "ea1e2de9-7db7-4b42-91ee-0cd1bf6df167"
 Measurements = "eff96d63-e80a-5855-80a2-b1b0885c5ab7"
 TaylorSeries = "6aa5eb33-94cf-58f4-a9d0-e4b2c4fc25ea"
+LsqFit = "2fda8390-95c7-5789-9bda-21331edee243"
 
 [compat]
 julia = "1.9"

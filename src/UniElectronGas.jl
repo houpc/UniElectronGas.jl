@@ -8,7 +8,7 @@ using Measurements
 using GreenFunc
 using FeynmanDiagram
 
-using LinearAlgebra, TaylorSeries
+using LinearAlgebra, TaylorSeries, LsqFit
 using Lehmann
 
 include("selfenergy.jl")

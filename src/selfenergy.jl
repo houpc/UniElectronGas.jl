@@ -14,6 +14,7 @@ function loaddata(para, FileName)
     for p in _partition
         rdata[p] = real(sigma[p][:, :])
         idata[p] = imag(sigma[p][:, :])
+        # println(p, " ", rdata[p][4])
     end
     return ngrid, kgrid, rdata, idata
 end
@@ -54,6 +55,10 @@ function save_zmu(para, datatuple; parafile="para_wn_1minus0.csv", root_dir=@__D
 
     dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
 
+    println("dmu: ", dmu)
+    println("dz: ", dz)
+    println("dzinv: ", dzinv)
+
     ############# save to csv  #################
     for P in keys(data)
         paraid = UEG.paraid(para)
@@ -86,34 +91,56 @@ function getZfactor(para; parafile="para_wn_1minus0.csv", root_dir=@__DIR__, isR
     end
 end
 
-function getMeff(para, filename, idx_dk=1; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+function getMeff(para, filename, idx_dk::Int=1; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
     order = para.order
     ngrid, kgrid, rdata, idata = loaddata(para, filename)
     _Meffinv = Dict()
     for (p, val) in rdata
-        _Meffinv[p] = meff_inverse(val, para, kgrid, idx_dk)
+        _Meffinv[p] = -meff_inverse(val, para, kgrid, idx_dk)
     end
 
-    _partition = UEG.partition(para.order)
-    # for p in _partition
-    #     println(p, " ", _Meffinv[p])
-    # end
-
     _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
-    # for p in keys(_mu)
-    #     _mu[p] = measurement(_mu[p].val, 0.0)
-    # end
+
     dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
     # println("zinv: ", dzinv)
-    # println("dmu: ", dmu)
+    println("dmu: ", dmu)
 
     dMeffinv, dmu, _dMeff = CounterTerm.sigmaCT(para.order, _mu, _Meffinv)
-    # println("_dMeff: ", _dMeff)
+    println("dMeffinv: ", dMeffinv)
     # for i in eachindex(_dMeff)
-    #     _dMeff[i] = _dMeff[i].val
+    #     # _dMeff[i] = _dMeff[i].val
+    #     _dMeff[i] *= (-1)^i
     # end
+    println("_dMeff: ", _dMeff)
     zinv = Taylor1([1.0, dzinv...], order)
+
     Meff = zinv * Taylor1([1.0, _dMeff...], order)
+    dMeff = [getcoeff(Meff, o) for o in 1:order]
+
+    sumMeff = accumulate(+, dMeff)
+    return @. 1.0 + sumMeff
+end
+
+function getMeff(para, rSigma, kgrid::Vector{Float64}; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    order, kF = para.order, para.kF
+
+    # fit ReΣ(k,ω0) = a*(k-kF) + b*(k-kF)^2
+    dMeffinv = []
+    x = kgrid
+    @. model(x, p) = p[1] + p[2] * (x - kF) + p[3] * (x - kF)^2
+    for o in 1:order
+        y = vec(Measurements.value.(rSigma[o]))
+        wt = vec(1 ./ Measurements.uncertainty.(rSigma[o]) .^ 2)
+        fit = curve_fit(model, x, y, wt, [1.0, -0.1, 0.0])
+        push!(dMeffinv, -Measurements.measurement(coef(fit)[2], stderror(fit)[2]) * para.me / kF)
+    end
+
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+    dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
+    zinv = Taylor1([1.0, dzinv...], order)
+
+    _Meffinv = Taylor1([1.0, dMeffinv...], order)
+    Meff = zinv / _Meffinv
     dMeff = [getcoeff(Meff, o) for o in 1:order]
 
     sumMeff = accumulate(+, dMeff)
