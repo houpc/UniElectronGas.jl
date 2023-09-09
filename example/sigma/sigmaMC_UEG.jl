@@ -1,13 +1,14 @@
 using ElectronLiquid
 using CompositeGrids
 
-dim = 2
-rs = [0.5,]
-mass2 = [2.0,]
+dim = 3
+rs = [1.0,]
+mass2 = [1.0, 2.0, 3.0]
 Fs = [-0.0,]
-beta = [50.0]
+beta = [25.0]
 order = [3,]
-neval = 1e6
+# neval = 2e7
+neval = 1e8
 isDynamic = false
 isFock = false
 diagGenerate = :GV
@@ -20,6 +21,8 @@ println("mission: ", mission)
 
 for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
     para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, isFock=isFock)
+    println(UEG.short(para))
+    # para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, isFock=isFock, spin=1)
     kF = para.kF
 
     if mission == "Z"
@@ -39,6 +42,7 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     end
 
     filename = "data_$(mission)_test.jld2"
+    # filename = "data$(dim)_$(mission).jld2"
 
     sigma, result = Sigma.MC(para; kgrid=kgrid, ngrid=ngrid,
         neval=neval, filename=filename,

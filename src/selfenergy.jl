@@ -14,7 +14,7 @@ function loaddata(para, FileName)
     for p in _partition
         rdata[p] = real(sigma[p][:, :])
         idata[p] = imag(sigma[p][:, :])
-        # println(p, " ", rdata[p][4])
+        println(p, " ", rdata[p])
     end
     return ngrid, kgrid, rdata, idata
 end
@@ -40,6 +40,7 @@ function save_zmu(para, datatuple; parafile="para_wn_1minus0.csv", root_dir=@__D
 
     if verbose > 0
         for p in sort([k for k in keys(data)])
+            # data[p] = data[p] .* 2.0
             println("$p: μ = $(mu(data[p]))   z_inverse = $(zfactor_inverse(data[p], para.β))")
         end
     end
@@ -69,6 +70,8 @@ end
 
 function getSigma(para, filename=filename; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
     ngrid, kgrid, rdata, idata = loaddata(para, filename)
+    # para1 = ParaMC(rs=para.rs, beta=para.beta, Fs=para.Fs, order=para.order - 1, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
+    # _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
     _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
 
     dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
@@ -101,11 +104,11 @@ function getMeff(para, filename, idx_dk::Int=1; parafile="para_wn_1minus0.csv", 
 
     _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
 
-    dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
+    dzinv, dmu, dz = CounterTerm.sigmaCT(order, _mu, _zinv)
     # println("zinv: ", dzinv)
     println("dmu: ", dmu)
 
-    dMeffinv, dmu, _dMeff = CounterTerm.sigmaCT(para.order, _mu, _Meffinv)
+    dMeffinv, dmu, _dMeff = CounterTerm.sigmaCT(order, _mu, _Meffinv)
     println("dMeffinv: ", dMeffinv)
     # for i in eachindex(_dMeff)
     #     # _dMeff[i] = _dMeff[i].val
@@ -128,6 +131,7 @@ function getMeff(para, rSigma, kgrid::Vector{Float64}; parafile="para_wn_1minus0
     dMeffinv = []
     x = kgrid
     @. model(x, p) = p[1] + p[2] * (x - kF) + p[3] * (x - kF)^2
+    println(rSigma)
     for o in 1:order
         y = vec(Measurements.value.(rSigma[o]))
         wt = vec(1 ./ Measurements.uncertainty.(rSigma[o]) .^ 2)

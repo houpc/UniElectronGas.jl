@@ -1,24 +1,31 @@
 using UniElectronGas, ElectronLiquid
 using JLD2, DelimitedFiles
 
-# dim = 3
-dim = 2
+dim = 3
+# dim = 2
+# spin = 1
+spin = 2
 # rs = [0.5, 1.0, 4.0,]
 rs = [1.0]
-mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
-# mass2 = [3.0]
+# mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+# mass2 = [0.5, 1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
+# mass2 = [2.2, 2.4, 2.6, 2.8]
+mass2 = [0.6, 0.7, 0.8, 0.9]
 Fs = [-0.0,]
-# beta = [20.0, 25.0, 40.0, 80.0]
-beta = [25.0,]
-order = [4,]
+beta = [20.0, 25.0, 40.0, 80.0]
+# beta = [25.0,]
+order = [3,]
 isDynamic = false
 
 const parafilename = "para_wn_1minus0.csv"
-const filename = "./data2d/data$(dim)d_Z.jld2"
+const filename = "./data_Z_v1.jld2"
+# const filename = "./data$(dim)d/data$(dim)d_Z.jld2"
+# const filename = "./data$(dim)d/data$(dim)d_Z_rs$(rs[1]).jld2"
+const savefilename = spin == 2 ? "zfactor_$(dim)d.dat" : "zfactor_$(dim)d_spin$spin.dat"
 
 function process(para, datatuple, isSave)
     if isSave
-        UniElectronGas.save_zmu(para, datatuple; parafile=parafilename)
+        UniElectronGas.save_zmu(para, datatuple; parafile=parafilename, verbose=1)
     end
     z = UniElectronGas.getZfactor(para, parafile=parafilename)
     println("Zfactor: ", z)
@@ -35,7 +42,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
     f = jldopen(filename, "r")
     results = Any[]
     for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
-        para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim)
+        para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, spin=spin)
         kF = para.kF
         for key in keys(f)
             loadpara = ParaMC(key)
@@ -47,7 +54,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
         end
     end
     if isSave
-        open("zfactor_$(dim)d.dat", "a+") do io
+        open(savefilename, "a+") do io
             writedlm(io, results)
         end
     end

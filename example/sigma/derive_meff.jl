@@ -3,22 +3,28 @@ using JLD2, DelimitedFiles
 
 # dim = 3
 dim = 2
-# rs = [0.5, 1.0, 4.0]
+# spin = 1
+spin = 2
+# rs = [0.5, 1.0, 2.0]
+# rs = [0.5]
 rs = [1.0]
-mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
-# mass2 = [3.0]
+# mass2 = [0.5, 1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0]
+mass2 = [1.5]
+# mass2 = [6.0, 7.0, 8.0]
 Fs = [-0.0,]
-# beta = [20.0, 25.0, 40.0, 80.0]
-beta = [25.0]
+beta = [20.0, 25.0, 40.0, 80.0]
+# beta = [25.0,]
+# beta = [40.0,]
 order = [4,]
+# order = [5,]
 isDynamic = false
 ### dSigma/dk = (Sigma[kF_label+idx_dk] - Sigma[kF_label-idx_dk]) / (kgrid[kF_label+idx_dk] - kgrid[kF_label-idx_dk])
 # inds_dk = [1, 2, 3]
 
 const parafilename = "para_wn_1minus0.csv"
-# const filename = "./data2d/data$(dim)d_K.jld2"
-# const filename = "./data$(dim)d_K.jld2"
-const filename = "./data2d/data$(dim)d_K.jld2"
+const filename = "./data$(dim)d/data$(dim)d_K.jld2"
+# const filename = "./data$(dim)d/data$(dim)d_K_rs$(rs[1]).jld2"
+const savefilename = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$spin.dat"
 
 if abspath(PROGRAM_FILE) == @__FILE__
     isSave = false
@@ -30,7 +36,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
     f = jldopen(filename, "r")
     results = Any[]
     for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
-        para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim)
+        para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, spin=spin)
         kF = para.kF
         for key in keys(f)
             loadpara = ParaMC(key)
@@ -52,7 +58,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
         end
     end
     if isSave
-        open("meff_$(dim)d.dat", "a+") do io
+        open(savefilename, "a+") do io
             writedlm(io, results)
         end
     end
