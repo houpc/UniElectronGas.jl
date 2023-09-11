@@ -40,7 +40,6 @@ function save_zmu(para, datatuple; parafile="para_wn_1minus0.csv", root_dir=@__D
 
     if verbose > 0
         for p in sort([k for k in keys(data)])
-            # data[p] = data[p] .* 2.0
             println("$p: μ = $(mu(data[p]))   z_inverse = $(zfactor_inverse(data[p], para.β))")
         end
     end

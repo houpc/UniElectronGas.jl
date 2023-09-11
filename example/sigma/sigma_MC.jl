@@ -3,12 +3,13 @@ using CompositeGrids
 
 dim = 3
 rs = [1.0,]
-mass2 = [1.0, 2.0, 3.0]
+# mass2 = [1.0, 2.0, 3.0]
+mass2 = [0.01]
 Fs = [-0.0,]
 beta = [25.0]
 order = [3,]
-# neval = 2e7
-neval = 1e8
+neval = 2e7
+# neval = 1e8
 isDynamic = false
 isFock = false
 diagGenerate = :GV
