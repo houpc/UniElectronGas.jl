@@ -2,22 +2,23 @@ using ElectronLiquid, UniElectronGas
 using JLD2, DelimitedFiles
 
 dim = 3
+# dim = 2
 rs = [1.0]
-# mass2 = [0.5, 1.0, 2.0, 2.5, 3.0, 4.0]
-# mass2 = [1.6, 1.8, 2.0, 2.2]
+# mass2 = [0.5, 1.0, 2.0, 2.5, 3.0, 3.5, 4.0]
+# mass2 = [1.0, 1.5, 2.0, 2.3, 3.0, 3.5, 4.0]
 mass2 = [2.3]
 Fs = [-0.0]
 beta = [80.0]
 # beta = [25.0, 40.0, 80.0]
-order = [4]
+order = [5]
 isDynamic = false
 isFock = false
 spinPolarPara = 0.0
 
 const parafilename = "para_wn_1minus0.csv"
-const filename = "data3d_freeE.jld2"
-# const filename_E0 = "E0_3d.dat"
-const filename_E0 = "E0_3d.txt"
+# const filename = "data$(dim)d_freeE.jld2"
+const filename = "data3d/data$(dim)d_freeE.jld2"
+const filename_E0 = "E0_$(dim)d.txt"
 const savefilename = "freeE_$(dim)d.dat"
 
 if abspath(PROGRAM_FILE) == @__FILE__
