@@ -2,15 +2,17 @@ using ElectronLiquid
 using CompositeGrids
 
 dim = 3
-rs = [1.0,]
+# rs = [1.0,]
+rs = [1.0, 2.0, 3.0]
+# rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
 # mass2 = [1.0, 2.0, 3.0]
-mass2 = [0.01]
+mass2 = [1e-3,]
 Fs = [-0.0,]
 beta = [25.0]
-order = [3,]
-neval = 2e7
+order = [2,]
+neval = 4e7
 # neval = 1e8
-isDynamic = false
+isDynamic = true
 isFock = false
 diagGenerate = :GV
 # diagGenerate = :Parquet

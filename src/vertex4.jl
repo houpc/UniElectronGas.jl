@@ -8,11 +8,12 @@ function ver4_PH(para; kamp=[para.kF,], kamp2=kamp, n=[-1, 0, 0, -1], ell=[0,],
 end
 
 function getVer4PHl(para, filename; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
-    if para.order < 4
-        para1 = UEG.ParaMC(rs=para.rs, beta=para.beta, Fs=para.Fs, Fa=-0.0, order=4, dim=para.dim,
-            mass2=para.mass2, isDynamic=para.isDynamic, isFock=para.isFock)
-    end
-    _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
+    # if para.order < 4
+    #     para1 = UEG.ParaMC(rs=para.rs, beta=para.beta, Fs=para.Fs, Fa=-0.0, order=4, dim=para.dim,
+    #         mass2=para.mass2, isDynamic=para.isDynamic, isFock=para.isFock)
+    # end
+    # _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
     dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
 
     vuu, vud = ver4PHl_renormalization(para, filename, dz, dmu)
