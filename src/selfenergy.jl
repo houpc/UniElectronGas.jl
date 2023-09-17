@@ -67,6 +67,12 @@ function save_zmu(para, datatuple; parafile="para_wn_1minus0.csv", root_dir=@__D
     CounterTerm.toFile(df, parafile, root_dir=root_dir)
 end
 
+function getdmu(para; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+    dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
+    return dmu
+end
+
 function getSigma(para, filename=filename; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
     ngrid, kgrid, rdata, idata = loaddata(para, filename)
     # para1 = ParaMC(rs=para.rs, beta=para.beta, Fs=para.Fs, order=para.order - 1, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
