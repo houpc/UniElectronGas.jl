@@ -16,7 +16,8 @@ beta = [80.0,]
 order = [5,]
 isDynamic = false
 
-const parafilename = "para_wn_1minus0.csv"
+# const parafilename = "para_wn_1minus0.csv"
+const parafilename = "para.csv"
 # const filename = "./data2d_Z_v0.jld2"
 const filename = "./data$(dim)d/data$(dim)_Z.jld2"
 # const filename = "./data$(dim)d/data$(dim)d_Z_beta80_rs$(rs[1]).jld2"

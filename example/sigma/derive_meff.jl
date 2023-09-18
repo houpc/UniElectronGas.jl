@@ -21,7 +21,8 @@ isDynamic = false
 ### dSigma/dk = (Sigma[kF_label+idx_dk] - Sigma[kF_label-idx_dk]) / (kgrid[kF_label+idx_dk] - kgrid[kF_label-idx_dk])
 # inds_dk = [1, 2, 3]
 
-const parafilename = "para_wn_1minus0.csv"
+# const parafilename = "para_wn_1minus0.csv"
+const parafilename = "para.csv"
 const filename = "./data$(dim)d/data$(dim)d_K.jld2"
 # const filename = "./data$(dim)d/data$(dim)d_K_rs$(rs[1]).jld2"
 const savefilename = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$spin.dat"

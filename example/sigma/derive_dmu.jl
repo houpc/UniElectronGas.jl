@@ -13,7 +13,8 @@ order = [4,]
 isDynamic = false
 spinPolarPara = 0.0
 
-const parafilename = "para_wn_1minus0.csv"
+# const parafilename = "para_wn_1minus0.csv"
+const parafilename = "para.csv"
 # const filename = "./data2d_Z_v0.jld2"
 const savefilename = "dmu_$(dim)d.dat"
 
