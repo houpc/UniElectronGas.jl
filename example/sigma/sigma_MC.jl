@@ -1,19 +1,20 @@
 using ElectronLiquid
 using CompositeGrids
 
-dim = 3
+dim = 2
 rs = [1.0,]
 # mass2 = [1.0, 2.0, 3.0]
-mass2 = [0.01]
+mass2 = [1,]
 Fs = [-0.0,]
 beta = [25.0]
-order = [3,]
-neval = 2e7
+order = [2,]
+neval = 1e6
 # neval = 1e8
 isDynamic = false
 isFock = false
 diagGenerate = :GV
 # diagGenerate = :Parquet
+isLayered2D = true
 
 # mission = :Z
 # mission = :K
@@ -42,11 +43,16 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
         error("unknown mission")
     end
 
-    filename = "data_$(mission)_test.jld2"
+    if isLayered2D
+        filename = "data_$(mission)_layered2d.jld2"
+    else
+        filename = "data_$(mission).jld2"
+    end
     # filename = "data$(dim)_$(mission).jld2"
 
     sigma, result = Sigma.MC(para; kgrid=kgrid, ngrid=ngrid,
         neval=neval, filename=filename,
+        isLayered2D=isLayered2D,
         diagtype=diagGenerate)
 
 end
