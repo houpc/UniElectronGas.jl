@@ -4,13 +4,15 @@ using CompositeGrids
 dim = 3
 # rs = [1.0,]
 # rs = [1.0, 2.0, 3.0]
-rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+# rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+rs = [1.0, 2.0, 3.0, 4.0, 5.0]
+Fs = -[0.223, 0.380, 0.516, 0.639, 0.752]
 # mass2 = [1.0, 2.0, 3.0]
 mass2 = [1e-3,]
-Fs = [-0.0,]
+# Fs = [-0.0,]
 beta = [100.0]
 order = [2,]
-neval = 4e7
+neval = 1e7
 # neval = 1e8
 isDynamic = true
 isFock = false
@@ -22,7 +24,10 @@ diagGenerate = :GV
 mission = ARGS[1]
 println("mission: ", mission)
 
-for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
+# for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
+for (irs, _mass2, _beta, _order) in Iterators.product([i for i in 1:length(rs)], mass2, beta, order)
+    _F = Fs[irs]
+    _rs = rs[irs]
     para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, isFock=isFock)
     println(UEG.short(para))
     # para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, isFock=isFock, spin=1)

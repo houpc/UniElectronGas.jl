@@ -5,14 +5,16 @@ dim = 3
 # dim = 2
 # spin = 1
 spin = 2
-rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+# rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+rs = [1.0, 2.0, 3.0, 4.0, 5.0]
+Fs = -[0.223, 0.380, 0.516, 0.639, 0.752]
 # rs = [1.0, 2.0, 3.0]
 # rs = [1.0]
 # mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
 # mass2 = [0.5, 1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
 # mass2 = [1.6, 1.8, 2.0, 2.2, 2.4]
 mass2 = [1e-3,]
-Fs = [-0.0,]
+# Fs = [-0.0,]
 # beta = [20.0, 25.0, 40.0, 80.0]
 beta = [100.0,]
 order = [2,]
@@ -44,7 +46,10 @@ if abspath(PROGRAM_FILE) == @__FILE__
 
     f = jldopen(filename, "r")
     results = Any[]
-    for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
+    # for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
+    for (irs, _mass2, _beta, _order) in Iterators.product([i for i in 1:length(rs)], mass2, beta, order)
+        _F = Fs[irs]
+        _rs = rs[irs]
         para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, spin=spin)
         kF = para.kF
         for key in keys(f)
