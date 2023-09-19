@@ -3,21 +3,46 @@ using JLD2, DelimitedFiles
 
 dim = 3
 spin = 2
-# rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
-rs = [1.0,]
+rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+# rs = [1.0,]
 # mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
 mass2 = [1e-3,]
 Fs = [-0.0]
-beta = [25.0]
+beta = [100.0]
 order = [2,]
-Nl = 2
+Nl = 1
 isDynamic = true
 isFock = false
+ω_c = 0.1
 
 const parafilename = "para_wn_1minus0.csv"
-const filename = "data_ver4PH.jld2"
-const savefilename1 = "Fsl_$(dim)d.dat"
-const savefilename2 = "Fal_$(dim)d.dat"
+const filename = "data_ver4PP.jld2"
+# const savefilename1 = "guu_$(dim)d.dat"
+# const savefilename2 = "gud_$(dim)d.dat"
+const savefilename1 = "gs_$(dim)d.dat"
+const savefilename2 = "ga_$(dim)d.dat"
+
+function Πs(para; ω_c=0.1)
+    return 1 / (2π^2) * para.kF * log(0.882 * ω_c * para.EF * para.β)
+end
+
+function Un(Γlist, Π, n)
+    Γlist .= -Γlist
+    result = 0.0
+    if n == 1
+        result += Γlist[1]
+    elseif n == 2
+        result += Γlist[2] - Γlist[1]^2 * Π
+    elseif n == 3
+        result += Γlist[3] - 2 * Γlist[1] * Π * Γlist[2] + Γlist[1]^3 * Π^2
+    end
+    return result
+end
+
+function Γ2U(Γlist, para; ω_c=0.1)
+    Π = Πs(para; ω_c=ω_c)
+    return [Un(Γlist, Π, n) for n in 1:length(Γlist)]
+end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     isSave = false
@@ -36,10 +61,13 @@ if abspath(PROGRAM_FILE) == @__FILE__
             if UEG.paraid(loadpara) == UEG.paraid(para)
                 println(UEG.paraid(para))
                 data_Fs, data_Fa = UniElectronGas.getVer4PHl(para, filename)
+                # data_uu, data_ud = (data_Fs + data_Fa), (data_Fs - data_Fa)
                 res_s = Any[_rs, _beta, _mass2, _order]
                 for il in 1:Nl
-                    push!(results_s, append!(Any[_rs, _beta, _mass2, _order, il-1], [real(data_Fs[o][il, 1]) for o in 1:_order]))
-                    push!(results_a, append!(Any[_rs, _beta, _mass2, _order, il-1], [real(data_Fa[o][il, 1]) for o in 1:_order]))
+                    # push!(results_s, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_uu[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
+                    # push!(results_a, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_ud[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
+                    push!(results_s, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_Fs[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
+                    push!(results_a, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_Fa[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
                 end
             end
         end

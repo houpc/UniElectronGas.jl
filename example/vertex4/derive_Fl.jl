@@ -11,7 +11,7 @@ mass2 = [1e-3,]
 Fs = [-0.0]
 beta = [25.0]
 order = [2,]
-Nl = 2
+Nl = 1
 isDynamic = true
 isFock = false
 

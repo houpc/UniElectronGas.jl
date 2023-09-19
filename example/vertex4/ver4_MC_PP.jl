@@ -1,15 +1,15 @@
 using ElectronLiquid, FeynmanDiagram
 
 dim = 3
-rs = [1.0,]
-mass2 = [1e-3,]
+rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+mass2 = [1e-6,]
 Fs = [-0.0,]
-beta = [25.0]
+beta = [100.0]
 order = [2,]
 # ell = [0, 1]
 ell = 0
 # neval = 2e7
-neval = 1e6
+neval = 4e6
 isDynamic = true
 isFock = false
 
