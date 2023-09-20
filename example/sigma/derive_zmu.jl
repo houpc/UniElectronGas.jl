@@ -2,24 +2,17 @@ using UniElectronGas, ElectronLiquid
 using JLD2, DelimitedFiles
 
 dim = 3
-# dim = 2
-# spin = 1
 spin = 2
-# rs = [0.5, 1.0, 1.5, 2.0, 3.0, 4.0]
 rs = [1.0]
-# mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
-# mass2 = [0.5, 1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
-mass2 = [1.0, 1.5, 2.0, 2.3, 3.0, 3.5, 4.0,]
+mass2 = [1.0]
 Fs = [-0.0,]
-# beta = [20.0, 25.0, 40.0, 80.0]
-beta = [80.0,]
-order = [5,]
+beta = [40.0]
+order = [4,]
 isDynamic = false
 
-# const parafilename = "para_wn_1minus0.csv"
-const parafilename = "para.csv"
+const parafilename = "para_wn_1minus0.csv"
 # const filename = "./data2d_Z_v0.jld2"
-const filename = "./data$(dim)d/data$(dim)_Z.jld2"
+const filename = "./data$(dim)d/data$(dim)d_Z.jld2"
 # const filename = "./data$(dim)d/data$(dim)d_Z_beta80_rs$(rs[1]).jld2"
 const savefilename = spin == 2 ? "zfactor_$(dim)d.dat" : "zfactor_$(dim)d_spin$spin.dat"
 
