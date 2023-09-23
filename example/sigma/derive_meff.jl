@@ -6,22 +6,22 @@ dim = 2
 # spin = 1
 spin = 2
 # rs = [0.5, 1.0, 2.0]
-rs = [1.0]
-# rs = [0.5]
+# rs = [1.0]
+rs = [0.5]
 # mass2 = [0.5, 1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0]
 # mass2 = [2.5, 3.0, 3.5, 4.0, 4.5]
-mass2 = [5.0,]
+mass2 = [3.5,]
 Fs = [-0.0,]
-# beta = [25.0,]
-beta = [40.0,]
+beta = [25.0,]
+# beta = [40.0,]
 # order = [4,]
 order = [5,]
 isDynamic = false
 ### dSigma/dk = (Sigma[kF_label+idx_dk] - Sigma[kF_label-idx_dk]) / (kgrid[kF_label+idx_dk] - kgrid[kF_label-idx_dk])
 
 const parafilename = "para_wn_1minus0.csv"
-# const filename = "./data$(dim)d/data$(dim)d_K.jld2"
-const filename = "./data$(dim)d/data$(dim)d_K_o5.jld2"
+const filename = "./data$(dim)d/data$(dim)d_K.jld2"
+# const filename = "./data$(dim)d/data$(dim)d_K_o5.jld2"
 const savefilename = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$spin.dat"
 
 if abspath(PROGRAM_FILE) == @__FILE__

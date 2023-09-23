@@ -6,7 +6,7 @@ dim = 2
 spin = 2
 # spin = 1
 # rs = [0.5, 1.0, 4.0]
-rs = [1.0]
+rs = [0.5]
 # rs = [2.0]
 # mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
 mass2 = [1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
@@ -58,16 +58,17 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
     xgrid = LinRange(0.0, 5.0, 100)
     for o in 1:maxOrder
         yval, yerr = meff[o], errors[o]
+        println("Order $o: ", x, yval, yerr)
         errorbar(x, yval, yerr=yerr, color=color[o], capsize=4, fmt="o", markerfacecolor="none", label="$o")
 
         yfit = curve_fit(Polynomial, x, yval, 5)
         o < 5 && plot(xgrid, yfit.(xgrid), color=color[o])
     end
-    xlim(0.8, 5.2)    #rs=1
-    ylim(0.945, 0.992)
+    # xlim(0.8, 5.2)    #rs=1
+    # ylim(0.945, 0.992)
     # ylim(0.88, 1.0)
-    # xlim(0.8, 4.7)    #rs=0.5
-    # ylim(0.94, 0.98)
+    xlim(0.8, 4.7)    #rs=0.5
+    ylim(0.94, 0.98)
     xlabel("lambda")
     ylabel("\$m^*/m\$")
     legend(title="order", loc=2)

@@ -80,9 +80,9 @@ end
 
 function getSigma(para, filename=filename; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
     ngrid, kgrid, rdata, idata = loaddata(para, filename)
-    # para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=4, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
-    # _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
-    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+    para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=5, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
+    _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
+    # _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
 
     dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
     rSw_k = CounterTerm.chemicalpotential_renormalization(para.order, rdata, dmu, verbose=1)
@@ -138,18 +138,18 @@ function getMeff(para, rSigma, kgrid::Vector{Float64}; parafile="para_wn_1minus0
     x = kgrid
     @. model(x, p) = p[1] + p[2] * (x - kF) + p[3] * (x - kF)^2
     println(rSigma)
-    # fit_parameters = []
+    fit_parameters = []
     for o in 1:order
         y = vec(Measurements.value.(rSigma[o]))
         wt = vec(1 ./ Measurements.uncertainty.(rSigma[o]) .^ 2)
         fit = curve_fit(model, x, y, wt, [1.0, -0.1, 0.0])
         push!(dMeffinv, -Measurements.measurement(coef(fit)[2], stderror(fit)[2]) * para.me / kF)
-        # push!(fit_parameters, [coef(fit), stderror(fit)])
+        push!(fit_parameters, [coef(fit), stderror(fit)])
     end
 
-    # para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=para.order, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
-    # _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
-    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+    para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=para.order, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
+    _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
+    # _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
     dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
     zinv = Taylor1([1.0, dzinv...], order)
     println(zinv)
@@ -160,6 +160,6 @@ function getMeff(para, rSigma, kgrid::Vector{Float64}; parafile="para_wn_1minus0
     dMeff = [getcoeff(Meff, o) for o in 1:order]
 
     sumMeff = accumulate(+, dMeff)
-    # return @. 1.0 + sumMeff, fit_parameters
-    return @. 1.0 + sumMeff
+    return @. 1.0 + sumMeff, fit_parameters
+    # return @. 1.0 + sumMeff
 end
