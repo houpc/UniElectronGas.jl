@@ -1,8 +1,10 @@
 using PyPlot
 using DelimitedFiles
+using CurveFit
 
 dim = 2
 spin = 2
+# spin = 1
 # rs = [0.5, 1.0, 4.0]
 rs = [1.0]
 # rs = [2.0]
@@ -10,9 +12,9 @@ rs = [1.0]
 mass2 = [1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
 # mass2 = [1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
 Fs = [-0.0,]
-# beta = [20.0, 25.0, 40.0, 80.0]
 beta = [25.0]
-order = [4,]
+# order = [4,]
+order = [5,]
 const fileName = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$spin.dat"
 
 cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "orange" => "#EE7733", "red" => "#CC3311", "magenta" => "#EE3377", "grey" => "#BBBBBB"]);
@@ -20,8 +22,7 @@ cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "or
 function plot_convergence(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[1], beta=beta[1])
     style = PyPlot.matplotlib."style"
     style.use(["science", "std-colors"])
-    # color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], cdict["cyan"], cdict["magenta"], cdict["grey"], "black"]
-    color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], cdict["cyan"], cdict["grey"], "black"]
+    color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], "black", cdict["cyan"], cdict["grey"]]
     #cmap = get_cmap("Paired")
     rcParams = PyPlot.PyDict(PyPlot.matplotlib."rcParams")
     rcParams["font.size"] = 16
@@ -37,8 +38,8 @@ function plot_convergence(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[1
     xlabel("Order")
     ylabel("\$m^*/m\$")
     legend(title="mass2")
-    title("rs=$rs, beta=$beta")
-    # title(r"$r_s=$(r_, beta=$")
+    # title("rs=$rs, beta=$beta")
+    title("rs=$rs")
     savefig("meff$(dim)d_rs$(rs)_beta$(beta)_spin1_conv_fitted.pdf")
 end
 
@@ -46,26 +47,32 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
     style = PyPlot.matplotlib."style"
     style.use(["science", "std-colors"])
     # color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], cdict["cyan"], cdict["magenta"], cdict["grey"], "black"]
-    color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], cdict["cyan"], cdict["grey"], "black"]
+    color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], "black", cdict["cyan"], cdict["grey"]]
     #cmap = get_cmap("Paired")
     rcParams = PyPlot.PyDict(PyPlot.matplotlib."rcParams")
     rcParams["font.size"] = 16
     rcParams["font.family"] = "Times New Roman"
     figure(figsize=(6, 4))
 
-    # x = collect(1:maxOrder)
     x = _mass2
+    xgrid = LinRange(0.0, 5.0, 100)
     for o in 1:maxOrder
         yval, yerr = meff[o], errors[o]
-        # errorbar(x[2:end], yval[2:end], yerr=yerr[2:end], color=color[o], capsize=4, fmt="o", markerfacecolor="none", label="$o")
         errorbar(x, yval, yerr=yerr, color=color[o], capsize=4, fmt="o", markerfacecolor="none", label="$o")
+
+        yfit = curve_fit(Polynomial, x, yval, 5)
+        o < 5 && plot(xgrid, yfit.(xgrid), color=color[o])
     end
-    # xlim(0.8, 4.5)
+    xlim(0.8, 5.2)    #rs=1
+    ylim(0.945, 0.992)
+    # ylim(0.88, 1.0)
+    # xlim(0.8, 4.7)    #rs=0.5
+    # ylim(0.94, 0.98)
     xlabel("lambda")
     ylabel("\$m^*/m\$")
-    legend(title="order")
-    title("rs=$rs, beta=$beta")
-    # title(r"$r_s=$(r_, beta=$")
+    legend(title="order", loc=2)
+    # title("rs=$rs, beta=$beta")
+    title("rs=$rs")
     if spin == 2
         savefig("meff$(dim)d_rs$(rs)_beta$(beta)_conv1.pdf")
     else
@@ -91,7 +98,8 @@ if abspath(PROGRAM_FILE) == @__FILE__
         idx = 0
         # println(_rs, _beta, _mass2)
         for i in 1:num_data
-            if meff_data[i, 1:3] == [_rs, _beta, _mass2]
+            # if meff_data[i, 1:3] == [_rs, _beta, _mass2]
+            if meff_data[i, 1] == _rs && meff_data[i, 3] == _mass2
                 idx = i
                 break
             end
@@ -102,6 +110,10 @@ if abspath(PROGRAM_FILE) == @__FILE__
         for o in 1:_order
             push!(meff, meff_data[idx, 3o+2])
             push!(error, meff_data[idx, 3o+4])
+        end
+        if _order < order[1]
+            push!(meff, 0.0)
+            push!(error, 0.0)
         end
         push!(meff_total, meff)
         push!(error_total, error)
