@@ -1,6 +1,7 @@
 using PyCall
 using PyPlot
 using DelimitedFiles
+using CurveFit
 
 @pyimport scienceplots  # `import scienceplots` is required as of version 2.0.0
 
@@ -19,8 +20,7 @@ cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "or
 function plot_convergence(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[1], beta=beta[1])
     style = PyPlot.matplotlib."style"
     style.use(["science", "std-colors"])
-    # color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], cdict["cyan"], cdict["magenta"], cdict["grey"], "black"]
-    color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], cdict["cyan"], cdict["grey"], "black"]
+    color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], "black", cdict["cyan"], cdict["grey"]]
     #cmap = get_cmap("Paired")
     rcParams = PyPlot.PyDict(PyPlot.matplotlib."rcParams")
     rcParams["font.size"] = 16
@@ -35,8 +35,8 @@ function plot_convergence(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[1
     xlabel("Order")
     ylabel("\$m^*/m\$")
     legend(title="mass2")
-    title("rs=$rs, beta=$beta")
-    # title(r"$r_s=$(r_, beta=$")
+    # title("rs=$rs, beta=$beta")
+    title("rs=$rs")
     savefig("meff$(dim)d_rs$(rs)_beta$(beta)_spin1_conv_fitted.pdf")
 end
 
@@ -79,8 +79,11 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
         # yval, yerr = meff[o], errors[o]
 
         # errorbar(x, yval, yerr=yerr, color=color[o], capsize=4, fmt="o", markerfacecolor="none", label="$o")
-        capsize = o == 5 ? 4 : nothing
-        errorbar(x, yval, yerr=yerr, color=color[o], capsize=capsize, markersize=3, fmt="o-", label="\$N=$o\$", zorder=10*o)
+        # capsize = o == 5 ? 4 : nothing
+        errorbar(x, yval, yerr=yerr, color=color[o], capsize=4, fmt="o", markerfacecolor="none", label="\$N=$o\$", zorder=10*o)
+
+        yfit = curve_fit(Polynomial, x, yval, 5)
+        o < 5 && plot(xgrid, yfit.(xgrid), color=color[o])
     end
     if dim == 3
         if rs == 1.0
@@ -131,7 +134,8 @@ if abspath(PROGRAM_FILE) == @__FILE__
         idx = 0
         # println(_rs, _beta, _mass2)
         for i in 1:num_data
-            if meff_data[i, 1:3] == [_rs, _beta, _mass2]
+            # if meff_data[i, 1:3] == [_rs, _beta, _mass2]
+            if meff_data[i, 1] == _rs && meff_data[i, 3] == _mass2
                 idx = i
                 break
             end

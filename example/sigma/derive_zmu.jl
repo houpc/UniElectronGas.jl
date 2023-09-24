@@ -11,16 +11,25 @@ order = [4,]
 isDynamic = false
 
 const parafilename = "para_wn_1minus0.csv"
-# const filename = "./data2d_Z_v0.jld2"
 const filename = "./data$(dim)d/data$(dim)d_Z.jld2"
-# const filename = "./data$(dim)d/data$(dim)d_Z_beta80_rs$(rs[1]).jld2"
+# const filename = "./data$(dim)d/data$(dim)d_Z_o5.jld2"
 const savefilename = spin == 2 ? "zfactor_$(dim)d.dat" : "zfactor_$(dim)d_spin$spin.dat"
 
-function process(para, datatuple, isSave)
-    if isSave
-        UniElectronGas.save_zmu(para, datatuple; parafile=parafilename, verbose=1)
+
+function zfactor_renorm(dz, dzinv; isRenorm=true)
+    if isRenorm
+        sumzinv = accumulate(+, dzinv)
+        return @. 1.0 / (1.0 + sumzinv)
+    else
+        sumz = accumulate(+, dz)
+        return @. 1.0 + sumz
     end
-    z = UniElectronGas.getZfactor(para, parafile=parafilename)
+end
+
+function process(para, datatuple, isSave)
+    dz, dzinv, dmu = UniElectronGas.get_dzmu(para, datatuple; parafile=parafilename, verbose=1, isSave)
+
+    z = zfactor_renorm(dz, dzinv)
     println("Zfactor: ", z)
     return z
 end

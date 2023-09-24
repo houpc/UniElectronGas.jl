@@ -11,11 +11,10 @@ beta = [40.0]
 order = [4,]
 isDynamic = false
 ### dSigma/dk = (Sigma[kF_label+idx_dk] - Sigma[kF_label-idx_dk]) / (kgrid[kF_label+idx_dk] - kgrid[kF_label-idx_dk])
-# inds_dk = [1, 2, 3]
 
 const parafilename = "para_wn_1minus0.csv"
 const filename = "./data$(dim)d/data$(dim)d_K.jld2"
-# const filename = "./data$(dim)d/data$(dim)d_K_rs$(rs[1]).jld2"
+# const filename = "./data$(dim)d/data$(dim)d_K_o5.jld2"
 const savefilename = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$spin.dat"
 
 if abspath(PROGRAM_FILE) == @__FILE__
@@ -36,16 +35,11 @@ if abspath(PROGRAM_FILE) == @__FILE__
                 println(UEG.paraid(para))
 
                 ngrid, kgrid, rSw_k, iSw_k = UniElectronGas.getSigma(para, filename)
-                meff = UniElectronGas.getMeff(para, rSw_k, kgrid)
+                meff, fit_p = UniElectronGas.getMeff(para, rSw_k, kgrid)
+                # meff = UniElectronGas.getMeff(para, rSw_k, kgrid)
                 println("m* / m = ", meff)
-                # for idx_dk in inds_dk
-                #     meff = UniElectronGas.getMeff(para, filename, idx_dk)
-                #     println("dk index number: $idx_dk")
-                #     println("m* / m = ", meff)
-                #     println()
-                #     push!(results, Any[_rs, _beta, _mass2, _order, idx_dk, meff...])
-                # end
                 push!(results, Any[_rs, _beta, _mass2, _order, meff...])
+                writedlm("fit.dat", fit_p)
             end
         end
     end
