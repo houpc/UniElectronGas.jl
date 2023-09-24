@@ -11,7 +11,7 @@ mass2 = [0.5, 1.0, 1.5, 2.0, 2.2, 2.3, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5
 Fs = [-0.0,]
 # beta = [25.0]
 beta = [80.0]
-order = [4,]
+order = [5,]
 const fileName = "freeE_$(dim)d.dat"
 const val_benchmark =
     cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "orange" => "#EE7733", "red" => "#CC3311", "magenta" => "#EE3377", "grey" => "#BBBBBB"]);
@@ -36,7 +36,8 @@ function plot_convergence(freeE, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[
         errorbar(x, yval, yerr=yerr, color=color[o], capsize=4, fmt="o", markerfacecolor="none", label="$o")
 
         yfit = curve_fit(Polynomial, x, yval, 4)
-        plot(xgrid, yfit.(xgrid), color=color[o])
+
+        o < 5 && plot(xgrid, yfit.(xgrid), color=color[o])
     end
     plot([0.0, 5.0], [1.174, 1.174], color="black", lw=1.5)
     # plot([0.0, 5.0], [-0.4196, -0.4196], color="black", lw=1.5)
@@ -47,7 +48,7 @@ function plot_convergence(freeE, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[
     ylabel("free energy")
     legend(title="order", loc=2)
     title("rs=$rs, beta=$beta")
-    savefig("freeE$(dim)d_rs$(rs)_beta$(beta)_conv.pdf")
+    savefig("freeE$(dim)d_rs$(rs)_beta$(beta)_conv_v1.pdf")
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
@@ -60,8 +61,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
         idx = 0
         # println(_rs, _beta, _mass2)
         for i in 1:num_data
-            # if freeE_data[i, 1:3] == [_rs, _beta, _mass2]
-            if freeE_data[i, 1:4] == [_rs, _beta, _mass2, order[1]]
+            if freeE_data[i, 1:3] == [_rs, _beta, _mass2] && freeE_data[i, 4] >= 4
                 idx = i
                 break
             end
@@ -72,6 +72,10 @@ if abspath(PROGRAM_FILE) == @__FILE__
         for o in 1:_order
             push!(freeE, freeE_data[idx, 3o+6])
             push!(error, freeE_data[idx, 3o+8])
+        end
+        if _order < order[1]
+            push!(freeE, 0.0)
+            push!(error, 0.0)
         end
         push!(freeE_total, freeE)
         push!(error_total, error)
