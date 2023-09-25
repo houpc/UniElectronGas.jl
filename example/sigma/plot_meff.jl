@@ -4,12 +4,50 @@ using DelimitedFiles
 using CurveFit
 
 @pyimport scienceplots  # `import scienceplots` is required as of version 2.0.0
+@pyimport scipy.interpolate as interp
+
+# rₛ ↦ λ*(rₛ), d = 3
+const fixed_lambda_optima_3d = Dict(
+    1.0 => 1.75,
+    2.0 => 2.0,
+)
+# rₛ ↦ λ*(rₛ, N), d = 3
+const lambda_optima_3d = Dict(
+    3.0 => [0.75, 0.75, 1.0, 1.25, 1.75],
+    4.0 => [0.625, 0.625, 0.75, 1.0, 1.125],
+)
+
+function spline(x, y, e; xmin=x[1], xmax=x[end])
+    # generate knots with spline without constraints
+    w = 1.0 ./ e
+    spl = interp.UnivariateSpline(x, y; w=w, k=3)
+    __x = collect(LinRange(xmin, xmax, 100))
+    yfit = spl(__x)
+    return __x, yfit
+end
+
+### rs = 1 ###
+# rs = [1.0]
+# mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0]
+
+### rs = 2 ###
+# rs = [2.0]
+# mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.625, 1.75, 1.875, 2.0, 2.5, 3.0]
+
+### rs = 3 ###
+# rs = [3.0]
+# mass2 = [0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.5, 1.75, 2.0]
+
+### rs = 4 ###
+# rs = [4.0]
+# mass2 = [0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.5, 2.0]
+
+### rs = 5 ###
+rs = [5.0]
+mass2 = [0.375, 0.5, 0.625, 0.75, 0.8125, 0.875, 0.9375, 1.0, 1.125, 1.25, 1.5]
 
 dim = 3
 spin = 2
-rs = [1.0]
-mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0]
-# mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0]
 Fs = [-0.0,]
 beta = [40.0]
 order = [5,]
@@ -63,6 +101,9 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
     rcParams["font.family"] = "Times New Roman"
     figure(figsize=(6, 4))
 
+    xmin_plot = Inf
+    xmax_plot = -Inf
+    xgrid = LinRange(0.0, 5.0, 100)
     for o in 1:maxOrder
         valid_meff = skipmissing(meff[o])
         valid_errors = skipmissing(errors[o])
@@ -72,28 +113,107 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
 
         yval = collect(valid_meff)
         yerr = collect(valid_errors)
-        
+
         println(x)
         println(yval)
 
-        # yval, yerr = meff[o], errors[o]
-
-        # errorbar(x, yval, yerr=yerr, color=color[o], capsize=4, fmt="o", markerfacecolor="none", label="$o")
         # capsize = o == 5 ? 4 : nothing
-        errorbar(x, yval, yerr=yerr, color=color[o], capsize=4, fmt="o", markerfacecolor="none", label="\$N=$o\$", zorder=10*o)
+        # errorbar(x, yval, yerr=yerr, color=color[o], markerfacecolor="none", capsize=capsize, fmt="o", label="\$N=$o\$", zorder=10 * o)
+        
+        # Plot order-by-order lambda optima for rs > 2 at d = 3
+        errorbar(
+            x,
+            yval,
+            yerr=yerr,
+            color=color[o],
+            capsize=4,
+            fmt="o",
+            markerfacecolor="none",
+            label="\$N = $o\$",
+            zorder=10 * o,
+        )
+        # if dim == 3 && rs > 2.0 && o > 1
+        #     lambda_star_o = lambda_optima_3d[rs][o]
+        #     errorbar(
+        #         [lambda_star_o],
+        #         yval[x.==lambda_star_o],
+        #         yerr=yerr[x.==lambda_star_o],
+        #         color=color[o],
+        #         capsize=4,
+        #         markersize=9,
+        #         marker="*",
+        #         # markerfacecolor="none",
+        #         zorder=100 * o,
+        #     )
+        #     errorbar(
+        #         x[x.!=lambda_star_o],
+        #         yval[x.!=lambda_star_o],
+        #         yerr=yerr[x.!=lambda_star_o],
+        #         color=color[o],
+        #         capsize=4,
+        #         markersize=5,
+        #         fmt="o",
+        #         markerfacecolor="none",
+        #         label="\$N = $o\$",
+        #         zorder=10 * o,
+        #     )
+        # else
+        #     errorbar(
+        #         x,
+        #         yval,
+        #         yerr=yerr,
+        #         color=color[o],
+        #         capsize=4,
+        #         markersize=5,
+        #         fmt="o",
+        #         markerfacecolor="none",
+        #         label="\$N = $o\$",
+        #         zorder=10 * o,
+        #     )
+        # end
 
-        yfit = curve_fit(Polynomial, x, yval, 5)
-        o < 5 && plot(xgrid, yfit.(xgrid), color=color[o])
+        xmin_plot = min(x[1], xmin_plot)
+        xmax_plot = max(x[end], xmax_plot)
+        if o < 5
+            xfit, yfit = spline(x, yval, yerr)
+            plot(xfit, yfit; color=color[o], linestyle="--")
+        end
     end
     if dim == 3
-        if rs == 1.0
-            xloc = 2.0
-            yloc = 0.971
-            xlim(0.75, 4.0)
-            ylim(0.865, 0.985)
-            lambda_opt = 1.75
-            axvline(lambda_opt; linestyle="--", color="dimgray", label="\$\\lambda^\\star = $(lambda_opt)\$")
+        xlim(xmin_plot, xmax_plot)
+        ylim(0.855, 1.0)
+        # Plot fixed lambda optima for rs = 1, 2 at d = 3
+        if rs in [1.0, 2.0]
+            axvline(fixed_lambda_optima_3d[rs]; linestyle="-", color="dimgray", zorder=-10)
         end
+        if rs == 1.0
+            xloc = 2.125
+            yloc = 0.98
+            ylim(0.84, 1.0)
+        elseif rs == 2.0
+            xloc = 0.75
+            yloc = 0.9825
+            ylim(0.865, 1.0)    
+        elseif rs == 3.0
+            xloc = 0.6
+            yloc = 0.8825
+            ylim(0.865, 1.0)
+        elseif rs == 4.0
+            xloc = 0.625
+            yloc = 0.905
+            ylim(0.89, 1.0)
+        elseif rs == 5.0
+            xloc = 0.525
+            yloc = 0.93
+            ylim(0.915, 1.015)
+        end
+        xmin, xmax = xlim()
+        ymin, ymax = ylim()
+        xstep = rs < 4 ? 0.5 : 0.25
+        big_xticks = collect(range(0.0, 5.0, step=xstep))
+        big_yticks = collect(range(0.8, 1.2, step=0.025))
+        xticks([t for t in big_xticks if xmin <= t <= xmax])
+        yticks([t for t in big_yticks if ymin <= t <= ymax])
     end
     # xlim(0.8 * minimum(mass2), 1.2 * maximum(mass2))
     text(
