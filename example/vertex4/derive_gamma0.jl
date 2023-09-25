@@ -7,11 +7,13 @@ spin = 2
 # rs = [1.0, 2.0, 3.0, 4.0, 5.0]
 # Fs = -[0.223, 0.380, 0.516, 0.639, 0.752]
 # Fs = -[0.223,]
-rs = [1.0,]
+rs = [2.0,]
 # mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
+mass2 = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 # mass2 = [1e-3,]
 # mass2 = [4.0,]
-mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+# mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+# mass2 = [2.5, 3.5]
 Fs = [-0.0]
 # Fs = -0.2 .* rs
 beta = [100.0]
@@ -30,8 +32,8 @@ const filename = "data_ver4PP.jld2"
 # const savefilename2 = "gako_$(dim)d.dat"
 # const savefilename1 = "gs_$(dim)d.dat"
 # const savefilename2 = "ga_$(dim)d.dat"
-const savefilename1 = "gsyuk_$(dim)d.dat"
-const savefilename2 = "gayuk_$(dim)d.dat"
+const savefilename1 = "gsyuk3_$(dim)d.dat"
+const savefilename2 = "gayuk3_$(dim)d.dat"
 
 function Πs(para; ω_c=0.1)
     return 1 / (2π^2) * para.kF * log(0.882 * ω_c * para.EF * para.β)

@@ -1,24 +1,29 @@
 using PyPlot
 using DelimitedFiles
 
-dim = 2
+dim = 3
 spin = 2
 # rs = [0.5, 1.0, 4.0]
-rs = [1.0]
-ells = [0, 1]
+# rs = [1.0]
+rs = [2.0,]
+ells = [0,]
 # symmetry = true
 symmetry = false
-mass2 = [1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
+# mass2 = [1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
+# mass2 = [1.0, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0]
+mass2 = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 Fs = [-0.0,]
-beta = [25.0]
-order = [3,]
-const fileName = symmetry ? "Fsl_$(dim)d.dat" : "Fal_$(dim)d.dat"
+beta = [100.0]
+order = [4,]
+# const fileName = symmetry ? "Fsl_$(dim)d.dat" : "Fal_$(dim)d.dat"
+const fileName = "gayuk3_3d.dat"
 
 cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "orange" => "#EE7733", "red" => "#CC3311", "magenta" => "#EE3377", "grey" => "#BBBBBB"]);
 
 function plot_convergence(ver4, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[1], beta=beta[1])
     style = PyPlot.matplotlib."style"
-    style.use(["science", "std-colors"])
+    # style.use(["science", "std-colors"])
+    style.use(["science"])
     # color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], cdict["cyan"], cdict["magenta"], cdict["grey"], "black"]
     color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], cdict["cyan"], cdict["grey"], "black"]
     #cmap = get_cmap("Paired")
@@ -43,7 +48,8 @@ end
 
 function plot_convergence_v1(ver4, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[1], beta=beta[1], ell=ells[1])
     style = PyPlot.matplotlib."style"
-    style.use(["science", "std-colors"])
+    # style.use(["science", "std-colors"])
+    style.use(["science"])
     # color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], cdict["cyan"], cdict["magenta"], cdict["grey"], "black"]
     color = [cdict["blue"], cdict["red"], cdict["teal"], cdict["orange"], cdict["cyan"], cdict["grey"], "black"]
     #cmap = get_cmap("Paired")
