@@ -30,5 +30,9 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     freeE, result = FreeEnergy.MC(para;
         isLayered2D=isLayered2D,
         neval=neval, filename=filename,
-        spinPolarPara=spinPolarPara, partition=[(1, 0, 0)])
+        spinPolarPara=spinPolarPara)
+
+    # freeE, result = FreeEnergy.MC(para; neval=neval, filename=filename, spinPolarPara=spinPolarPara)
+    # freeE, result = FreeEnergy.MC(para; neval=neval, filename=filename,
+    #     spinPolarPara=spinPolarPara, partition=[(0, 0, 0)])
 end

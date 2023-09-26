@@ -12,6 +12,7 @@ neval = 1e6
 # neval = 1e8
 isDynamic = false
 isFock = false
+spinPolarPara = 0.0 # spin-polarization parameter (n_up - n_down) / (n_up + n_down) ∈ [0,1]
 diagGenerate = :GV
 # diagGenerate = :Parquet
 isLayered2D = true
@@ -50,9 +51,8 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     end
     # filename = "data$(dim)_$(mission).jld2"
 
-    sigma, result = Sigma.MC(para; kgrid=kgrid, ngrid=ngrid,
+    sigma, result = Sigma.MC(para; kgrid=kgrid, ngrid=ngrid, spinPolarPara=spinPolarPara,
         neval=neval, filename=filename,
         isLayered2D=isLayered2D,
         diagtype=diagGenerate)
-
 end
