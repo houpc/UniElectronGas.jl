@@ -25,8 +25,8 @@ else
 end
 # const filename = "data$(dim)d_freeE.jld2"
 # const filename = "data3d/data$(dim)d_freeE.jld2"
-const filename_E0 = "E0_$(dim)d.dat"
-const savefilename = "freeE_$(dim)d.dat"
+const filename_E0 = "E0_$(dim)d.txt"
+const savefilename = "freeE_$(dim)d.txt"
 
 if abspath(PROGRAM_FILE) == @__FILE__
     isSave = false

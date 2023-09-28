@@ -45,9 +45,9 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     end
 
     if isLayered2D
-        filename = "data_$(mission)_layered2d.jld2"
+        filename = "./data$(dim)d/data_$(mission)_layered2d.jld2"
     else
-        filename = "data_$(mission).jld2"
+        filename = "./data$(dim)d/data_$(mission).jld2"
     end
     # filename = "data$(dim)_$(mission).jld2"
 
