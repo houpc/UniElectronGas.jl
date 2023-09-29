@@ -16,8 +16,7 @@ isFock = false
 spinPolarPara = 0.0
 
 const parafilename = "para_wn_1minus0.csv"
-# const filename = "data$(dim)d_freeE.jld2"
-const filename = "data3d/data$(dim)d_freeE.jld2"
+const filename = "data$(dim)d_freeE.jld2"
 const filename_E0 = "E0_$(dim)d.txt"
 const savefilename = "freeE_$(dim)d.dat"
 
@@ -29,9 +28,9 @@ if abspath(PROGRAM_FILE) == @__FILE__
     end
 
     f = jldopen(filename, "r")
-    open(filename_E0, "r") do io
-        E0_data = readdlm(filename_E0)
-    end
+    # open(filename_E0, "r") do io
+    E0_data = readdlm(filename_E0)
+    # end
     results = Any[]
     for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
         para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, isFock=isFock, dim=dim)
