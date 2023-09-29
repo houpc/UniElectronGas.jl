@@ -2,6 +2,7 @@ using PyCall
 using PyPlot
 using DelimitedFiles
 using CurveFit
+using Measurements
 
 @pyimport scienceplots  # `import scienceplots` is required as of version 2.0.0
 @pyimport scipy.interpolate as interp
@@ -17,6 +18,22 @@ const lambda_optima_3d = Dict(
     4.0 => [0.625, 0.625, 0.75, 1.0, 1.125],
 )
 
+lambdas_3d = Dict(
+    1.0 => [1.75, 1.75, 1.75, 1.75, 1.75],
+    2.0 => [2.0, 2.0, 2.0, 2.0, 2.0],
+    3.0 => [0.75, 0.75, 1.0, 1.25, 1.75],
+    4.0 => [0.625, 0.625, 0.75, 1.0, 1.125],
+    5.0 => [0.5, 0.5, 0.625, 0.875, 0.875],
+)
+
+# rₛ ↦ λ*(rₛ), d = 3
+const fixed_lambda_optima_3d_GV_spin_polarized = Dict(
+    1.0 => 1.5,
+)
+lambdas_3d_GV_spin_polarized = Dict(
+    1.0 => [1.5, 1.5, 1.5, 1.5, 1.5],
+)
+
 function spline(x, y, e; xmin=x[1], xmax=x[end])
     # generate knots with spline without constraints
     w = 1.0 ./ e
@@ -27,8 +44,8 @@ function spline(x, y, e; xmin=x[1], xmax=x[end])
 end
 
 ### rs = 1 ###
-# rs = [1.0]
-# mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0]
+rs = [1.0]
+mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0]
 
 ### rs = 2 ###
 # rs = [2.0]
@@ -43,15 +60,27 @@ end
 # mass2 = [0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.5, 2.0]
 
 ### rs = 5 ###
-rs = [5.0]
-mass2 = [0.375, 0.5, 0.625, 0.75, 0.8125, 0.875, 0.9375, 1.0, 1.125, 1.25, 1.5]
+# rs = [5.0]
+# mass2 = [0.375, 0.5, 0.625, 0.75, 0.8125, 0.875, 0.9375, 1.0, 1.125, 1.25, 1.5]
 
 dim = 3
 spin = 2
 Fs = [-0.0,]
 beta = [40.0]
+# order = [4,]
 order = [5,]
-const fileName = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$spin.dat"
+
+spinPolarPara = 0.0
+# spinPolarPara = 1.0
+
+ispolarized = spinPolarPara != 0.0
+polarstr = ispolarized ? "_GV_spin_polarized" : ""
+
+if ispolarized
+    const filename = spin == 2 ? "meff_$(dim)d_GV_spin_polarized.dat" : "meff_$(dim)d_spin$(spin)_GV_spin_polarized.dat"
+else
+    const filename = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$(spin).dat"
+end
 
 cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "orange" => "#EE7733", "red" => "#CC3311", "magenta" => "#EE3377", "grey" => "#BBBBBB"]);
 
@@ -75,7 +104,7 @@ function plot_convergence(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[1
     legend(title="mass2")
     # title("rs=$rs, beta=$beta")
     title("rs=$rs")
-    savefig("meff$(dim)d_rs$(rs)_beta$(beta)_spin1_conv_fitted.pdf")
+    savefig("meff$(dim)d_rs$(rs)_beta$(beta)_spin1_conv_fitted$(polarstr).pdf")
 end
 
 function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[1], beta=beta[1])
@@ -114,12 +143,16 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
         yval = collect(valid_meff)
         yerr = collect(valid_errors)
 
-        println(x)
-        println(yval)
+        # println(x)
+        # println(yval)
+
+        # yopt = yval[x .≈ lambdas_3d[rs][o]][1]
+        # yerropt = yerr[x .≈ lambdas_3d[rs][o]][1]
+        # println("N = $o, lambda = $(lambdas_3d[rs][o]):\tm*/m = $(yopt) ± $(yerropt)")
 
         # capsize = o == 5 ? 4 : nothing
         # errorbar(x, yval, yerr=yerr, color=color[o], markerfacecolor="none", capsize=capsize, fmt="o", label="\$N=$o\$", zorder=10 * o)
-        
+
         # Plot order-by-order lambda optima for rs > 2 at d = 3
         errorbar(
             x,
@@ -180,32 +213,65 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
         end
     end
     if dim == 3
-        xlim(xmin_plot, xmax_plot)
+        xpad = rs < 3 ? 0.1 : 0.05
+        xlim(xmin_plot - xpad, xmax_plot + xpad)
         ylim(0.855, 1.0)
         # Plot fixed lambda optima for rs = 1, 2 at d = 3
         if rs in [1.0, 2.0]
-            axvline(fixed_lambda_optima_3d[rs]; linestyle="-", color="dimgray", zorder=-10)
+            if ispolarized
+                lambda_optimum = fixed_lambda_optima_3d_GV_spin_polarized[rs]
+            else
+                lambda_optimum = fixed_lambda_optima_3d[rs]
+            end
+            axvline(lambda_optimum; linestyle="-", color="dimgray", zorder=-10)
         end
         if rs == 1.0
-            xloc = 2.125
-            yloc = 0.98
-            ylim(0.84, 1.0)
+            if ispolarized
+                xloc = 2.125
+                yloc = 0.98
+                ylim(0.84, 1.005)
+                if spinPolarPara == 1.0
+                    text(
+                        0.8,
+                        0.855,
+                        "\$n_\\downarrow = 0\$";
+                        fontsize=16
+                    )
+                else
+                    text(
+                        0.68,
+                        0.98,
+                        "\$\\frac{n_\\uparrow - n_\\downarrow}{n_\\uparrow + n_\\downarrow} = $spinPolarPara\$";
+                        fontsize=16
+                    )
+                end
+            else
+                xloc = 2.125
+                yloc = 0.98
+                ylim(0.84, 1.005)
+                text(
+                    1.0,
+                    0.855,
+                    "\$n_\\uparrow = n_\\downarrow\$";
+                    fontsize=16
+                )
+            end
         elseif rs == 2.0
             xloc = 0.75
             yloc = 0.9825
-            ylim(0.865, 1.0)    
+            ylim(0.865, 1.005)
         elseif rs == 3.0
             xloc = 0.6
             yloc = 0.8825
-            ylim(0.865, 1.0)
+            ylim(0.865, 1.005)
         elseif rs == 4.0
             xloc = 0.625
             yloc = 0.905
-            ylim(0.89, 1.0)
+            ylim(0.89, 1.005)
         elseif rs == 5.0
             xloc = 0.525
             yloc = 0.93
-            ylim(0.915, 1.015)
+            ylim(0.915, 1.02)
         end
         xmin, xmax = xlim()
         ymin, ymax = ylim()
@@ -222,7 +288,7 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
         "\$r_s = $(rs),\\, \\beta \\hspace{0.1em} \\epsilon_F = $(beta)\$";
         fontsize=16
     )
-    legend(; loc="lower right")
+    legend(; loc="lower right", ncol=2, columnspacing=0.9)
     xlabel("\$\\lambda\$ (Ry)")
     ylabel("\$m^\\star / m\$")
     # plt.tight_layout()
@@ -230,15 +296,15 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
     # title("rs=$rs, beta=$beta")
     # title(r"$r_s=$(r_, beta=$")
     if spin == 2
-        savefig("meff$(dim)d_rs$(rs)_beta$(beta)_fitted.pdf")
+        savefig("meff$(dim)d_rs$(rs)_beta$(beta)_fitted$(polarstr).pdf")
     else
-        savefig("meff$(dim)d_rs$(rs)_beta$(beta)_spin$(spin)_fitted.pdf")
+        savefig("meff$(dim)d_rs$(rs)_beta$(beta)_spin$(spin)_fitted$(polarstr).pdf")
     end
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
 
-    meff_data = readdlm(fileName)
+    meff_data = readdlm(filename)
     num_data = size(meff_data)[1]
     # num_data = 8
 

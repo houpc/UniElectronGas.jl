@@ -5,9 +5,9 @@ dim = 3
 spin = 2
 
 ### rs = 1 ###
-# rs = [1.0]
-# order = [4,]
-# mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0]
+rs = [1.0]
+order = [4,]
+mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0]
 # order = [5,]
 # mass2 = [1.5, 1.75, 2.0, 3.0, 3.5]
 
@@ -33,21 +33,32 @@ spin = 2
 # mass2 = [0.875, 1.0, 1.125, 1.25, 1.5]
 
 ### rs = 5 ###
-rs = [5.0]
+# rs = [5.0]
 # order = [4,]
 # mass2 = [0.375, 0.5, 0.625, 0.75, 1.0, 1.125, 1.25, 1.5]
-order = [5,]
-mass2 = [0.8125, 0.875, 0.9375, 1.0, 1.125, 1.25]
+# order = [5,]
+# mass2 = [0.8125, 0.875, 0.9375, 1.0, 1.125, 1.25]
 
 Fs = [-0.0,]
 beta = [40.0]
 isDynamic = false
 ### dSigma/dk = (Sigma[kF_label+idx_dk] - Sigma[kF_label-idx_dk]) / (kgrid[kF_label+idx_dk] - kgrid[kF_label-idx_dk])
 
-const parafilename = "para_wn_1minus0.csv"
-const filename = "./data$(dim)d/data$(dim)d_K.jld2"
-# const filename = "./data$(dim)d/data$(dim)d_K_o5.jld2"
-const savefilename = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$spin.dat"
+# spinPolarPara = 0.0
+spinPolarPara = 1.0
+
+ispolarized = spinPolarPara != 0.0
+
+if ispolarized
+    const parafilename = "para_wn_1minus0_GV_spin_polarized.csv"
+    const filename = "./data$(dim)d/data$(dim)d_K_GV_spin_polarized.jld2"
+    const savefilename = spin == 2 ? "meff_$(dim)d_GV_spin_polarized.dat" : "meff_$(dim)d_spin$(spin)_GV_spin_polarized.dat"
+else
+    const parafilename = "para_wn_1minus0.csv"
+    const filename = "./data$(dim)d/data$(dim)d_K.jld2"
+    # const filename = "./data$(dim)d/data$(dim)d_K_o5.jld2"
+    const savefilename = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$(spin).dat"
+end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     isSave = false
@@ -66,8 +77,8 @@ if abspath(PROGRAM_FILE) == @__FILE__
             if UEG.paraid(loadpara) == UEG.paraid(para)
                 println(UEG.paraid(para))
 
-                ngrid, kgrid, rSw_k, iSw_k = UniElectronGas.getSigma(para, filename)
-                meff, fit_p = UniElectronGas.getMeff(para, rSw_k, kgrid)
+                ngrid, kgrid, rSw_k, iSw_k = UniElectronGas.getSigma(para, filename; parafile=parafilename)
+                meff, fit_p = UniElectronGas.getMeff(para, rSw_k, kgrid; parafile=parafilename)
                 # meff = UniElectronGas.getMeff(para, rSw_k, kgrid)
                 println("m* / m = ", meff)
                 push!(results, Any[_rs, _beta, _mass2, _order, meff...])
