@@ -4,7 +4,7 @@ using CompositeGrids
 dim = 2
 rs = [1.0,]
 # mass2 = [1.0, 2.0, 3.0]
-mass2 = [1,]
+mass2 = [0.1,]
 Fs = [-0.0,]
 beta = [25.0]
 order = [2,]

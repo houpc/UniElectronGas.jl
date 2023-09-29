@@ -6,11 +6,11 @@ dim = 2
 rs = [1.0]
 # mass2 = [0.5, 1.0, 2.0, 2.5, 3.0, 3.5, 4.0]
 # mass2 = [1.0, 1.5, 2.0, 2.3, 3.0, 3.5, 4.0]
-mass2 = [1.0,]
+mass2 = [0.1,]
 Fs = [-0.0]
 beta = [25.0]
 # beta = [25.0, 40.0, 80.0]
-order = [2]
+order = [0]
 isDynamic = false
 isFock = false
 spinPolarPara = 0.0
@@ -28,6 +28,29 @@ end
 const filename_E0 = "E0_$(dim)d.txt"
 const savefilename = "freeE_$(dim)d.txt"
 
+function free_energy_0(para)
+    if para.dim == 2
+        return para.basic.n * para.EF / 2
+    elseif para.dim == 3
+        return para.basic.n * para.EF * 3 / 5
+    else
+        error("unknown dimension")
+    end
+
+    # E0_data = []
+    # f = jldopen(filename, "r")
+    # open(filename_E0, "r") do io
+    #     append!(E0_data, readdlm(filename_E0))
+    # end
+    # idx = 0
+    # for i in 1:size(E0_data)[1]
+    #     if E0_data[i, 1:2] == [_rs, _beta]
+    #         idx = i
+    #         break
+    #     end
+    # end
+end
+
 if abspath(PROGRAM_FILE) == @__FILE__
     isSave = false
     if length(ARGS) >= 1 && (ARGS[1] == "s" || ARGS[1] == "-s" || ARGS[1] == "--save" || ARGS[1] == " save")
@@ -36,9 +59,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
     end
 
     f = jldopen(filename, "r")
-    open(filename_E0, "r") do io
-        E0_data = readdlm(filename_E0)
-    end
+
     results = Any[]
     for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
         para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, isFock=isFock, dim=dim)
@@ -46,19 +67,9 @@ if abspath(PROGRAM_FILE) == @__FILE__
         for key in keys(f)
             loadpara = ParaMC(key)
             if UEG.paraid(loadpara) == UEG.paraid(para)
-                println(UEG.paraid(para))
-                idx = 0
-                for i in 1:size(E0_data)[1]
-                    if E0_data[i, 1:2] == [_rs, _beta]
-                        idx = i
-                        break
-                    end
-                end
-                if idx == 0
-                    energy = UniElectronGas.getEnergy(para, filename)
-                else
-                    energy = UniElectronGas.getEnergy(para, filename, E0_data[idx, 4:5])
-                end
+                println("working on ", UEG.paraid(para))
+                energy0 = free_energy_0(para)
+                energy = UniElectronGas.getEnergy(para, filename, [energy0, 0.0]; parafile=parafilename)
                 push!(results, Any[_rs, _beta, _mass2, _order, spinPolarPara, energy...])
             end
         end

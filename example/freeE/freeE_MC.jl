@@ -3,13 +3,13 @@ using JLD2
 
 dim = 2
 rs = [1.0]
-mass2 = [1.0,]
+mass2 = [0.1,]
 # mass2 = [0.5, 1.0, 2.0, 4.0]
 # mass2 = [0.001]
 Fs = [-0.0,]
 # beta = [25.0, 40.0, 80.0]
 beta = [25.0]
-order = [2,]
+order = [0,]
 neval = 1e6
 isDynamic = false # dynamically screened Coulomb interaction or not
 isFock = false # Fock renormalized Green's function or not
