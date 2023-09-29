@@ -7,7 +7,7 @@ rs = [1.0]
 beta = [25.0]
 neval = 1e6
 isDynamic = false
-spinPolarPara = spin / 2 - 1 # spin-polarization parameter (n_up - n_down) / (n_up + n_down) ∈ [0,1] 
+spinPolarPara = 2 / spin - 1 # spin-polarization parameter (n_up - n_down) / (n_up + n_down) ∈ [0,1] 
 filename = "E0_$(dim)d.txt"
 
 function n(ω::T, β::T) where {T}
