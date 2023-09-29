@@ -10,7 +10,7 @@ mass2 = [0.1,]
 Fs = [-0.0]
 beta = [25.0]
 # beta = [25.0, 40.0, 80.0]
-order = [0]
+order = [2]
 isDynamic = false
 isFock = false
 spinPolarPara = 0.0
@@ -59,19 +59,20 @@ if abspath(PROGRAM_FILE) == @__FILE__
     end
 
     f = jldopen(filename, "r")
+    paras = [UEG.paraid(ParaMC(k)) for k in keys(f)]
 
+    # E0_data = readdlm(filename_E0)
     results = Any[]
     for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
         para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, isFock=isFock, dim=dim)
         kF = para.kF
-        for key in keys(f)
-            loadpara = ParaMC(key)
-            if UEG.paraid(loadpara) == UEG.paraid(para)
-                println("working on ", UEG.paraid(para))
-                energy0 = free_energy_0(para)
-                energy = UniElectronGas.getEnergy(para, filename, [energy0, 0.0]; parafile=parafilename)
-                push!(results, Any[_rs, _beta, _mass2, _order, spinPolarPara, energy...])
-            end
+        if UEG.paraid(para) in paras
+            println("working on ", UEG.paraid(para))
+            energy0 = free_energy_0(para)
+            energy = UniElectronGas.getEnergy(para, filename, [energy0, 0.0]; parafile=parafilename)
+            push!(results, Any[_rs, _beta, _mass2, _order, spinPolarPara, energy...])
+        else
+            println("missing ", UEG.paraid(para), " in jld2 MC data file.")
         end
     end
 

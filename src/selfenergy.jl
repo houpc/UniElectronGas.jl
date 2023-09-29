@@ -80,12 +80,13 @@ end
 
 function getSigma(para, filename=filename; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
     ngrid, kgrid, rdata, idata = loaddata(para, filename)
-    para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=5, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
-    _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
-    # _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+    # para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=5, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
+    # _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
 
     dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
-    rSw_k = CounterTerm.chemicalpotential_renormalization(para.order, rdata, dmu, verbose=1)
+    rSw_k = CounterTerm.chemicalpotential_renormalization(para.order, rdata, dmu)
+    # rSw_k = CounterTerm.chemicalpotential_renormalization(para.order, rdata, dmu, verbose=1)
     iSw_k = CounterTerm.chemicalpotential_renormalization(para.order, idata, dmu)
 
     return ngrid, kgrid, rSw_k, iSw_k
@@ -147,9 +148,9 @@ function getMeff(para, rSigma, kgrid::Vector{Float64}; parafile="para_wn_1minus0
         push!(fit_parameters, [coef(fit), stderror(fit)])
     end
 
-    para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=para.order, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
-    _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
-    # _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+    # para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=para.order, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
+    # _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
     dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
     zinv = Taylor1([1.0, dzinv...], order)
     println(zinv)
