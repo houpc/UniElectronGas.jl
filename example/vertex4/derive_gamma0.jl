@@ -7,22 +7,22 @@ spin = 2
 # rs = [1.0, 2.0, 3.0, 4.0, 5.0]
 # Fs = -[0.223, 0.380, 0.516, 0.639, 0.752]
 # Fs = -[0.223,]
-rs = [2.0,]
+rs = [1.0,]
 # mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
-mass2 = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
+# mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
 # mass2 = [1e-3,]
 # mass2 = [4.0,]
 # mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
 # mass2 = [2.5, 3.5]
 Fs = [-0.0]
-# Fs = -0.2 .* rs
+# Fs = -0.0 .* rs
 beta = [100.0]
-order = [4,]
+order = [5,]
 Nl = 1
 # isDynamic = true
 isDynamic = false
 isFock = false
-ω_c = 0.01
+ω_c = 0.1
 
 const parafilename = "para_wn_1minus0.csv"
 const filename = "data_ver4PP.jld2"
@@ -30,10 +30,10 @@ const filename = "data_ver4PP.jld2"
 # const savefilename2 = "gud_$(dim)d.dat"
 # const savefilename1 = "gsko_$(dim)d.dat"
 # const savefilename2 = "gako_$(dim)d.dat"
-# const savefilename1 = "gs_$(dim)d.dat"
-# const savefilename2 = "ga_$(dim)d.dat"
-const savefilename1 = "gsyuk3_$(dim)d.dat"
-const savefilename2 = "gayuk3_$(dim)d.dat"
+const savefilename1 = "gsrpa_$(dim)d.dat"
+const savefilename2 = "garpa_$(dim)d.dat"
+# const savefilename1 = "gsyuk3_$(dim)d.dat"
+# const savefilename2 = "gayuk3_$(dim)d.dat"
 
 function Πs(para; ω_c=0.1)
     return 1 / (2π^2) * para.kF * log(0.882 * ω_c * para.EF * para.β)
@@ -55,6 +55,16 @@ function Un(Γlist, Π, n)
         result += Γlist[2] - Γlist[1]^2 * Π
         result += Γlist[3] - 2 * Γlist[1] * Π * Γlist[2] + Γlist[1]^3 * Π^2
         result += Γlist[4] - 2 * Γlist[1] * Π * Γlist[3] + 3 * Γlist[1]^2 * Π^2 * Γlist[2] - Γlist[1]^4 * Π^3
+    elseif n == 5
+        result += Γlist[1]
+        result += Γlist[2] - Γlist[1]^2 * Π
+        result += Γlist[3] - 2 * Γlist[1] * Π * Γlist[2] + Γlist[1]^3 * Π^2
+        result += Γlist[4] - 2 * Γlist[1] * Π * Γlist[3] + 3 * Γlist[1]^2 * Π^2 * Γlist[2] - Γlist[1]^4 * Π^3
+        result += (Γlist[5] - 2 * (Γlist[1] * Π * Γlist[4] + Γlist[2] * Π * Γlist[3])
+                   +
+                   3 * (Γlist[1]^2 * Π^2 * Γlist[3] + Γlist[2]^2 * Π^2 * Γlist[1])
+                   -
+                   4 * Γlist[1]^3 * Π^3 * Γlist[2] + Γlist[1]^5 * Π^4)
     end
     return result
 end
