@@ -5,8 +5,8 @@ dim = 3
 
 rs = [1.0,]
 # mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
-mass2 = [5.0,]
-# mass2 = [1.0,]
+# mass2 = [2.0,]
+mass2 = [1.0,]
 # mass2 = [6.0, 8.0, 10.0, 12.0, 14.0]
 # mass2 = [10.5, 11.0]
 # mass2 = [1e-3,]
@@ -21,7 +21,7 @@ neval = 1e7
 isDynamic = false
 isFock = false
 
-const filename = "data_ver3.jld2"
+const filename = "data_ver3aa.jld2"
 
 # anglegrid = [0.0, 0.25π, 0.5π, 0.75π, π]
 anglegrid = [π,]
@@ -44,7 +44,8 @@ for (irs, _mass2, _beta, _order) in Iterators.product([i for i in 1:length(rs)],
     diagram = Ver3.diagram(para, partition; filter=[NoHartree, Proper])
     # diagram = Ver3.diagram(para, partition; filter=[NoHartree, NoBubble, Proper])
 
-    ver3, result = ver3_static(para, diagram, anglegrid; neval=neval, reweight_goal=reweight_goal, filename=filename)
+    # ver3, result = ver3_static(para, diagram, anglegrid; neval=neval, reweight_goal=reweight_goal, filename=filename)
     # ver3, result = ver3_static(para, diagram, anglegrid; neval=neval, filename=filename)
+    ver3, result = ver3_angle(para, diagram; neval=neval, reweight_goal=reweight_goal, filename=filename)
 
 end

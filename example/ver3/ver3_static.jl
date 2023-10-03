@@ -26,3 +26,26 @@ function ver3_static(para::ParaMC, diagram, anglegrid;
     end
 
 end
+
+function ver3_angle(para::ParaMC, diagram;
+    filename=nothing,
+    kamp=para.kF,
+    kamp2=kamp,
+    kwargs...)
+    ver3, result = Ver3.AA(para, diagram;
+        kamp=[kamp,],
+        kamp2=[kamp2,],
+        kwargs...)
+
+    if isnothing(filename) == false
+        jldopen(filename, "a+") do f
+            key = "$(UEG.short(para))"
+            if haskey(f, key)
+                @warn("replacing existing data for $key")
+                delete!(f, key)
+            end
+            f[key] = (kamp, kamp2, [0,], ver3)
+        end
+    end
+
+end
