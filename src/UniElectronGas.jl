@@ -13,5 +13,6 @@ using Lehmann
 
 include("selfenergy.jl")
 include("vertex4.jl")
+include("vertex3.jl")
 include("energy.jl")
 end
