@@ -1,20 +1,7 @@
 using ElectronLiquid, UniElectronGas
 using JLD2, DelimitedFiles
 
-dim = 2
-# dim = 2
-rs = [1.0]
-# mass2 = [0.5, 1.0, 2.0, 2.5, 3.0, 3.5, 4.0]
-# mass2 = [1.0, 1.5, 2.0, 2.3, 3.0, 3.5, 4.0]
-mass2 = [0.1,]
-Fs = [-0.0]
-beta = [25.0]
-# beta = [25.0, 40.0, 80.0]
-order = [2]
-isDynamic = false
-isFock = false
-spinPolarPara = 0.0
-isLayered2D = true
+include("../input.jl")
 
 if isLayered2D
     const parafilename = "para_wn_1minus0_layered2d.csv"
