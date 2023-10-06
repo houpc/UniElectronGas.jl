@@ -4,10 +4,8 @@ using JLD2, DelimitedFiles
 include("../input.jl")
 
 if isLayered2D
-    const parafilename = "para_wn_1minus0_layered2d.csv"
     const filename = "./data_freeE_layered2d.jld2"
 else
-    const parafilename = "para_wn_1minus0.csv"
     const filename = "./data_freeE.jld2"
 end
 # const filename = "data$(dim)d_freeE.jld2"

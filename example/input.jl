@@ -16,3 +16,9 @@ isLayered2D = true
 
 spin = 2
 spinPolarPara = 2 / spin - 1 # spin-polarization parameter (n_up - n_down) / (n_up + n_down) ∈ [0,1]
+
+if isLayered2D
+    const parafilename = "para_wn_1minus0_layered2d.csv"
+else
+    const parafilename = "para_wn_1minus0.csv"
+end
