@@ -31,6 +31,7 @@ function getEnergy(para, filename, E0=nothing; parafile="para_wn_1minus0.csv", r
         E_eachorder = [measurement(E0[1], E0[2]),]
     end
     # append!(E_eachorder, dF_eachorder .+ dF0_eachorder)
+    # If add dF0, we will be calculating Gibbs free energy. Here we need Helmholtz free energy.
     append!(E_eachorder, dF_eachorder)
 
     println("free energy/V from each order: ", E_eachorder)
