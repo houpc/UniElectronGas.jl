@@ -1,26 +1,15 @@
 using UniElectronGas, ElectronLiquid
 using JLD2, DelimitedFiles
 
-# dim = 3
-dim = 2
-spin = 1
-# spin = 2
-# rs = [0.1]
-rs = [1.0]
-# mass2 = [1.0, 1.4, 1.6, 1.8, 3.2, 3.4, 3.6]
-# mass2 = [0.5, 1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0, 8.0]
-# mass2 = [4.0, 4.5, 5.0, 5.5]
-mass2 = [0.25, 1.75,]
-Fs = [-0.0,]
-# beta = [20.0, 25.0, 40.0, 80.0]
-beta = [40.0,]
-# beta = [25.0,]
-order = [4,]
-isDynamic = false
+include("../input.jl")
 
-const parafilename = "para_wn_1minus0.csv"
-const filename = "./data$(dim)d/data$(dim)d_Z.jld2"
-# const filename = "./data$(dim)d/data$(dim)d_Z_o5.jld2"
+if isLayered2D
+    const filename = "./data$(dim)d/data_Z_layered2d.jld2"
+else
+    const filename = "./data$(dim)d/data_Z.jld2"
+end
+# const filename = "./data2d_Z_v0.jld2"
+# const filename = "./data$(dim)d/data$(dim)d_Z_beta80_rs$(rs[1]).jld2"
 const savefilename = spin == 2 ? "zfactor_$(dim)d.dat" : "zfactor_$(dim)d_spin$spin.dat"
 
 
@@ -50,6 +39,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
     end
 
     f = jldopen(filename, "r")
+    println(filename)
     results = Any[]
     for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
         para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, spin=spin)
@@ -57,7 +47,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
         for key in keys(f)
             loadpara = ParaMC(key)
             if UEG.paraid(loadpara) == UEG.paraid(para)
-                println(UEG.paraid(para))
+                println("loading ... ", UEG.paraid(para))
                 zfactor = process(para, f[key], isSave)
                 push!(results, Any[_rs, _beta, _mass2, _order, zfactor...])
             end

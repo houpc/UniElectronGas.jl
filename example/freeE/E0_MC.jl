@@ -1,11 +1,11 @@
 using ElectronLiquid, MCIntegration
 using DelimitedFiles
 
-dim = 2
 spin = 2
+dim = 2
 rs = [1.0]
-beta = [40.0]
-neval = 1e7
+beta = [25.0]
+neval = 1e6
 isDynamic = false
 spinPolarPara = 2 / spin - 1 # spin-polarization parameter (n_up - n_down) / (n_up + n_down) ∈ [0,1] 
 filename = "E0_$(dim)d.txt"

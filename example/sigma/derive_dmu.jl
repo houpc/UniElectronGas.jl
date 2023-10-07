@@ -1,19 +1,21 @@
 using UniElectronGas, ElectronLiquid
 using JLD2, DelimitedFiles
 
-dim = 3
-# dim = 2
-spin = 2
-rs = [1.0]
-mass2 = [2.0,]
-# mass2 = [0.5, 1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
-Fs = [-0.0,]
-beta = [25.0,]
-order = [4,]
-isDynamic = false
-spinPolarPara = 0.0
+# dim = 3
+# # dim = 2
+# spin = 2
+# rs = [1.0]
+# mass2 = [2.0,]
+# # mass2 = [0.5, 1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
+# Fs = [-0.0,]
+# beta = [25.0,]
+# order = [4,]
+# isDynamic = false
+# spinPolarPara = 0.0
 
-const parafilename = "para_wn_1minus0.csv"
+include("../input.jl")
+
+# const parafilename = "para_wn_1minus0.csv"
 # const filename = "./data2d_Z_v0.jld2"
 const savefilename = "dmu_$(dim)d.dat"
 

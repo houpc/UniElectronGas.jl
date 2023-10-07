@@ -1,16 +1,18 @@
 using ElectronLiquid, FeynmanDiagram
 using CompositeGrids
 
-dim = 3
-rs = [1.0,]
-mass2 = [1.0]
-Fs = [-0.0,]
-beta = [25.0]
-order = [3,]
-neval = 2e7
-isDynamic = false
-isFock = false
-diagGenerate = :GV
+include("../input.jl")
+
+# dim = 3
+# rs = [1.0,]
+# mass2 = [1.0]
+# Fs = [-0.0,]
+# beta = [25.0]
+# order = [3,]
+# neval = 2e7
+# isDynamic = false
+# isFock = false
+# diagGenerate = :GV
 # diagGenerate = :Parquet
 response = ChargeCharge
 # response = SpinSpin
