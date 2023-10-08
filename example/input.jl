@@ -1,11 +1,10 @@
 dim = 2 # dimension of the problem
 rs = [1.0,]
-# mass2 = [1.0, 2.0, 3.0]
 mass2 = [1.0, 1.25, 1.5, 1.75, 2.0]  # screening parameter
 Fs = [-0.0,]    # Fermi liquid parameter with zero angular momentum
 beta = [40.0]   # inverse temperature beta = β*E_F 
 order = [5,]    # order of diagrams
-neval = 1e10    # number of Monte Carlo samples
+neval = 1e5    # number of Monte Carlo samples
 # neval = 1e8
 isDynamic = false # whether to use effective field theory with dynamic screening or not 
 isFock = false # whether to use Fock renormalization or not
