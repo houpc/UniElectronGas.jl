@@ -28,10 +28,10 @@ lambdas_3d = Dict(
 
 # rₛ ↦ λ*(rₛ), d = 3
 const fixed_lambda_optima_3d_GV_spin_polarized = Dict(
-    1.0 => 1.5,
+    1.0 => 1.75,
 )
 lambdas_3d_GV_spin_polarized = Dict(
-    1.0 => [1.5, 1.5, 1.5, 1.5, 1.5],
+    1.0 => [1.75, 1.75, 1.75, 1.75, 1.75],
 )
 
 function spline(x, y, e; xmin=x[1], xmax=x[end])
@@ -67,11 +67,10 @@ dim = 3
 spin = 2
 Fs = [-0.0,]
 beta = [40.0]
-# order = [4,]
 order = [5,]
 
-spinPolarPara = 0.0
-# spinPolarPara = 1.0
+# spinPolarPara = 0.0
+spinPolarPara = 1.0
 
 ispolarized = spinPolarPara != 0.0
 polarstr = ispolarized ? "_GV_spin_polarized" : ""
@@ -229,7 +228,7 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
             if ispolarized
                 xloc = 2.125
                 yloc = 0.98
-                ylim(0.84, 1.005)
+                ylim(0.83, 1.005)
                 if spinPolarPara == 1.0
                     text(
                         0.8,
