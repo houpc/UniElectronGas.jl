@@ -17,21 +17,23 @@ spin = 1    # 2 for unpolarized, 1 for polarized
 spinPolarPara = 2 / spin - 1 # spin-polarization parameter (n_up - n_down) / (n_up + n_down) ∈ [0,1]
 ispolarized = spinPolarPara != 0.0
 
+data_directory = joinpath(@__DIR__, "sigma/data$(dim)d")
+
 if isLayered2D
     const parafilename = "para_wn_1minus0_layered2d.csv"
-    const simga_z_filename = "./data$(dim)d/data$(dim)d_Z_$(diagGenerate)_layered.jld2"
-    const sigma_k_filename = "./data$(dim)d/data$(dim)d_K_$(diagGenerate)_layered.jld2"
-    const zfactor_filename = spin == 2 ? "zfactor_layered2d.dat" : "zfactor_layered2d_spin$(spin).dat" 
+    const simga_z_filename = joinpath(data_directory, "data$(dim)d_Z_$(diagGenerate)_layered.jld2")
+    const sigma_k_filename = joinpath(data_directory, "data$(dim)d_K_$(diagGenerate)_layered.jld2")
+    const zfactor_filename = spin == 2 ? "zfactor_layered2d.dat" : "zfactor_layered2d_spin$(spin).dat"
 elseif ispolarized
     const parafilename = "para_wn_1minus0_GV_spin_polarized.csv"
-    const sigma_z_filename = "./data$(dim)d/data$(dim)d_Z_GV_spin_polarized.jld2"
-    const sigma_k_filename = "./data$(dim)d/data$(dim)d_K_GV_spin_polarized.jld2"
+    const sigma_z_filename = joinpath(data_directory, "data$(dim)d_Z_GV_spin_polarized.jld2")
+    const sigma_k_filename = joinpath(data_directory, "data$(dim)d_K_GV_spin_polarized.jld2")
     const meff_filename = spin == 2 ? "meff_$(dim)d_GV_spin_polarized.dat" : "meff_$(dim)d_spin$(spin)_GV_spin_polarized.dat"
     const zfactor_filename = spin == 2 ? "zfactor_$(dim)d_GV_spin_polarized.dat" : "zfactor_$(dim)d_spin$(spin)_GV_spin_polarized.dat"
 else
     const parafilename = "para_wn_1minus0.csv"
-    const sigma_z_filename = "./data$(dim)d/data$(dim)d_Z_$(diagGenerate).jld2"
-    const sigma_k_filename = "./data$(dim)d/data$(dim)d_K_$(diagGenerate).jld2"
+    const sigma_z_filename = joinpath(data_directory, "data$(dim)d_Z_$(diagGenerate).jld2")
+    const sigma_k_filename = joinpath(data_directory, "data$(dim)d_K_$(diagGenerate).jld2")
     const meff_filename = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$(spin).dat"
-    const zfactor_filename = spin == 2 ? "zfactor_$(dim)d.dat" : "zfactor_$(dim)d_spin$(spin).dat" 
+    const zfactor_filename = spin == 2 ? "zfactor_$(dim)d.dat" : "zfactor_$(dim)d_spin$(spin).dat"
 end

@@ -31,13 +31,13 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     end
 
     if isLayered2D
-        filename = "./data$(dim)d/data$(dim)d_$(mission)_$(diagGenerate)_layered.jld2"
+        filename = joinpath(data_directory, "data$(dim)d_$(mission)_$(diagGenerate)_layered.jld2")
     elseif ispolarized
         @assert diagGenerate == :GV
-        filename = "./data$(dim)d/data$(dim)d_$(mission)_GV_spin_polarized.jld2"
+        filename = joinpath(data_directory, "data$(dim)d_$(mission)_GV_spin_polarized.jld2")
     else
-        # filename = "./data$(dim)d/data$(dim)d_$(mission).jld2"
-        filename = "./data$(dim)d/data$(dim)d_$(mission)_$(diagGenerate).jld2"
+        # filename = joinpath(data_directory, "data$(dim)d_$(mission).jld2")
+        filename = joinpath(data_directory, "data$(dim)d_$(mission)_$(diagGenerate).jld2")
     end
     # filename = "data$(dim)_$(mission).jld2"
 
