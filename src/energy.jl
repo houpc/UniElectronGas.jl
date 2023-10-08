@@ -1,14 +1,12 @@
 function getEnergy(para, filename, E0=nothing; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
-    if para.order < 4
-        para1 = UEG.ParaMC(rs=para.rs, beta=para.beta, Fs=para.Fs, Fa=-0.0, order=4, dim=para.dim,
-            mass2=para.mass2, isDynamic=para.isDynamic, isFock=para.isFock)
-    else
-        para1 = para
-    end
-    # para1 = UEG.ParaMC(rs=para.rs, beta=para.beta, Fs=para.Fs, Fa=-0.0, order=4, dim=para.dim,
-    #     mass2=para.mass2, isDynamic=para.isDynamic, isFock=para.isFock)
-    _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
-    dzinv, dmu, dz = CounterTerm.sigmaCT(para1.order, _mu, _zinv)
+    # if para.order < 4
+    #     para1 = UEG.ParaMC(rs=para.rs, beta=para.beta, Fs=para.Fs, Fa=-0.0, order=4, dim=para.dim,
+    #         mass2=para.mass2, isDynamic=para.isDynamic, isFock=para.isFock)
+    # else
+    #     para1 = para
+    # end
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+    dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
 
     density, order = para.basic.n, para.order
     key = UEG.short(para)
@@ -32,11 +30,14 @@ function getEnergy(para, filename, E0=nothing; parafile="para_wn_1minus0.csv", r
     else
         E_eachorder = [measurement(E0[1], E0[2]),]
     end
-    append!(E_eachorder, dF_eachorder .+ dF0_eachorder)
+    # append!(E_eachorder, dF_eachorder .+ dF0_eachorder)
+    # If add dF0, we will be calculating Gibbs free energy. Here we need Helmholtz free energy.
+    append!(E_eachorder, dF_eachorder)
 
-
-    println("free energy: ", E_eachorder)
-    return accumulate(+, E_eachorder) ./ para.basic.n
+    println("free energy/V from each order: ", E_eachorder)
+    F = accumulate(+, E_eachorder) ./ density
+    println("free energy/N at each order (Ha): ", F ./ 2)
+    return F
 end
 
 

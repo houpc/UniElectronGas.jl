@@ -1,5 +1,5 @@
-function sigma(para; neval=1e6, ngrid=[-1, 0, 1], kgrid=[para.kF], filename=nothing, diagtype=:GV)
-    sigma, result = Sigma.MC(para; kgrid=kgrid, ngrid=ngrid, neval=neval, filename=filename, diagtype=diagtype)
+function sigma(para; neval=1e6, ngrid=[-1, 0, 1], kgrid=[para.kF], filename=nothing, diagtype=:GV, isLayered2D=false)
+    sigma, result = Sigma.MC(para; kgrid=kgrid, ngrid=ngrid, neval=neval, filename=filename, diagtype=diagtype, isLayered2D=isLayered2D)
     return sigma, result
 end
 
@@ -80,12 +80,13 @@ end
 
 function getSigma(para, filename=filename; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
     ngrid, kgrid, rdata, idata = loaddata(para, filename)
-    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
     # para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=5, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
     # _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
 
     dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
     rSw_k = CounterTerm.chemicalpotential_renormalization(para.order, rdata, dmu)
+    # rSw_k = CounterTerm.chemicalpotential_renormalization(para.order, rdata, dmu, verbose=1)
     iSw_k = CounterTerm.chemicalpotential_renormalization(para.order, idata, dmu)
 
     return ngrid, kgrid, rSw_k, iSw_k

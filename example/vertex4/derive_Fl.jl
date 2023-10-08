@@ -1,18 +1,20 @@
 using ElectronLiquid, UniElectronGas
 using JLD2, DelimitedFiles
 
-dim = 2
-spin = 2
-rs = [1.0]
-mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
-Fs = [-0.0]
-beta = [25.0]
-order = [4]
+# dim = 2
+# spin = 2
+# rs = [1.0]
+# mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
+# Fs = [-0.0]
+# beta = [25.0]
+# order = [4]
 Nl = 2
-isDynamic = false
-isFock = false
+# isDynamic = false
+# isFock = false
 
-const parafilename = "para_wn_1minus0.csv"
+include("../input.jl")
+
+# const parafilename = "para_wn_1minus0.csv"
 const filename = "data_ver4PH.jld2"
 const savefilename1 = "Fsl_$(dim)d.dat"
 const savefilename2 = "Fal_$(dim)d.dat"

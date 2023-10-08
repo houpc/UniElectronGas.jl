@@ -69,19 +69,18 @@ Fs = [-0.0,]
 beta = [40.0]
 order = [5,]
 
-# spinPolarPara = 0.0
-spinPolarPara = 1.0
-
-ispolarized = spinPolarPara != 0.0
 polarstr = ispolarized ? "_GV_spin_polarized" : ""
 
-if ispolarized
-    const filename = spin == 2 ? "meff_$(dim)d_GV_spin_polarized.dat" : "meff_$(dim)d_spin$(spin)_GV_spin_polarized.dat"
-else
-    const filename = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$(spin).dat"
-end
-
 cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "orange" => "#EE7733", "red" => "#CC3311", "magenta" => "#EE3377", "grey" => "#BBBBBB"]);
+
+function spline(x, y, e; xmin=x[1], xmax=x[end])
+    # generate knots with spline without constraints
+    w = 1.0 ./ e
+    spl = interp.UnivariateSpline(x, y; w=w, k=3)
+    __x = collect(LinRange(xmin, xmax, 100))
+    yfit = spl(__x)
+    return __x, yfit
+end
 
 function plot_convergence(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[1], beta=beta[1])
     style = PyPlot.matplotlib."style"
@@ -96,7 +95,7 @@ function plot_convergence(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[1
     x = collect(1:maxOrder)
     for (idx, yval) in enumerate(meff)
         yerr = errors[idx]
-        errorbar(x, yval, yerr=yerr, color=color[idx], capsize=4, fmt="o", markerfacecolor="none", label="$(_mass2[idx])")
+        errorbar(x, yval, yerr=yerr, color=color[idx], capsize=4, fmt="o", markerfacecolor="none", label="\$N=\$ $(_mass2[idx])")
     end
     xlabel("Order")
     ylabel("\$m^*/m\$")
@@ -303,7 +302,7 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
 
-    meff_data = readdlm(filename)
+    meff_data = readdlm(meff_filename)
     num_data = size(meff_data)[1]
     # num_data = 8
 
@@ -314,16 +313,33 @@ if abspath(PROGRAM_FILE) == @__FILE__
     #     push!(error_order, meff_data[:, 3o+4])
     # end
 
-    meff_total, error_total, mass2_total = [], [], []
-    for (_rs, _beta, _mass2) in Iterators.product(rs, beta, mass2)
-        idx = 0
-        # println(_rs, _beta, _mass2)
-        for i in 1:num_data
-            # if meff_data[i, 1:3] == [_rs, _beta, _mass2]
-            if meff_data[i, 1] == _rs && meff_data[i, 3] == _mass2
-                idx = i
-                break
+    for _rs in rs
+        meff_total, error_total, mass2_total = [], [], []
+        # for (_rs, _beta, _mass2) in Iterators.product(rs, beta, mass2)
+        for (_beta, _mass2) in Iterators.product(beta, mass2)
+            idx = 0
+            # println(_rs, _beta, _mass2)
+            for i in 1:num_data
+                # if meff_data[i, 1:3] == [_rs, _beta, _mass2]
+                if meff_data[i, 1] == _rs && meff_data[i, 3] == _mass2
+                    idx = i
+                    break
+                end
             end
+            idx == 0 && continue
+            _order = meff_data[idx, 4]
+            meff, error = [], [], []
+            for o in 1:_order
+                push!(meff, meff_data[idx, 3o+2])
+                push!(error, meff_data[idx, 3o+4])
+            end
+            if _order < order[1]
+                push!(meff, 0.0)
+                push!(error, 0.0)
+            end
+            push!(meff_total, meff)
+            push!(error_total, error)
+            push!(mass2_total, meff_data[idx, 3])
         end
         idx == 0 && continue
         _order = meff_data[idx, 4]
@@ -359,5 +375,6 @@ if abspath(PROGRAM_FILE) == @__FILE__
         push!(error_order, error_total[o, :])
     end
 
-    plot_convergence_v1(meff_order, error_order, mass2_total)
+        plot_convergence_v1(meff_order, error_order, mass2_total, rs=_rs)
+    end
 end
