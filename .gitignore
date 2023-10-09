@@ -23,6 +23,7 @@ deps/src/
 *.aux
 *.DS_Store
 *.xdv
+*.xcf
 *.dat
 *.err
 *.out
