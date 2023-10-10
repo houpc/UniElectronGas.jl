@@ -1,18 +1,17 @@
-dim = 2 # dimension of the problem
-rs = [1.0,]
-mass2 = [1.0, 1.25, 1.5, 1.75, 2.0]  # screening parameter
+dim = 3 # dimension of the problem
+rs = [0.5,]
+mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]  # screening parameter
 Fs = [-0.0,]    # Fermi liquid parameter with zero angular momentum
 beta = [40.0]   # inverse temperature beta = β*E_F 
-order = [5,]    # order of diagrams
+order = [4,]    # order of diagrams
 neval = 1e10    # number of Monte Carlo samples
 isDynamic = false # whether to use effective field theory with dynamic screening or not 
 isFock = false # whether to use Fock renormalization or not
 
 diagGenerate = :GV # :GV or :Parquet, algorithm to generate diagrams
-# diagGenerate = :Parquet
 isLayered2D = false # whether to use layered 2D system or not
 
-spin = 1    # 2 for unpolarized, 1 for polarized
+spin = 2    # 2 for unpolarized, 1 for polarized
 spinPolarPara = 2 / spin - 1 # spin-polarization parameter (n_up - n_down) / (n_up + n_down) ∈ [0,1]
 ispolarized = spinPolarPara != 0.0
 
