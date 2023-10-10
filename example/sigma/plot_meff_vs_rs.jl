@@ -34,6 +34,7 @@ cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "or
 
 meff_data = Dict(
     # Fixed lambda for rs < 3
+    # 0.5 => [...,],
     1.0 => [0.93574 ± 0.0001, 0.94731 ± 0.00011, 0.94992 ± 0.00013, 0.95129 ± 0.00025, 0.95109 ± 0.00092],
     2.0 => [0.97009 ± 0.00027, 0.95709 ± 0.00035, 0.95099 ± 0.00041, 0.9504 ± 0.00066, 0.9516 ± 0.0019],
     # Minimal sensitivity for rs ≥ 3
@@ -43,6 +44,7 @@ meff_data = Dict(
     5.0 => [1.0 ± 0.0, 0.96925 ± 0.00068, 0.9696 ± 0.001, 0.9752 ± 0.0015, 0.9766 ± 0.0052],
 )
 lambdas = Dict(
+    # 0.5 => [...,],
     1.0 => [1.75, 1.75, 1.75, 1.75, 1.75],
     2.0 => [2.0, 2.0, 2.0, 2.0, 2.0],
     3.0 => [0.75, 0.75, 1.0, 1.25, 1.75],
@@ -66,7 +68,7 @@ rcParams["font.size"] = 16
 rcParams["font.family"] = "Times New Roman"
 figure(figsize=(6, 4))
 
-rslist = [1.0, 2.0, 3.0, 4.0, 5.0]
+rslist = [0.5, 1.0, 2.0, 3.0, 4.0, 5.0]
 for o in 1:maxOrder
     # for o in maxOrder:maxOrder
     yval = [meff_data[rs][o].val for rs in rslist]
@@ -148,7 +150,11 @@ for rs in rslist
     # plot(xfit, yfit; color=cdict["blue"], linestyle="--")
     lambdastr = rs < 3 ? ",\\, \\lambda^\\star = $(lambdas[rs][1])" : ""
     yloc = 0.99
-    if rs == 1.0
+    if rs == 0.5
+        yloc=0.9375
+        xlim(0.75, 5.25)
+        ylim(0.934, 0.956)
+    elseif rs == 1.0
         yloc=0.9375
         xlim(0.75, 5.25)
         ylim(0.934, 0.956)

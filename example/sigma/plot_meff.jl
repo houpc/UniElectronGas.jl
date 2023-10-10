@@ -7,8 +7,11 @@ using Measurements
 @pyimport scienceplots  # `import scienceplots` is required as of version 2.0.0
 @pyimport scipy.interpolate as interp
 
+include("../input.jl")
+
 # rₛ ↦ λ*(rₛ), d = 3
 const fixed_lambda_optima_3d = Dict(
+    # 0.5 => ...,
     1.0 => 1.75,
     2.0 => 2.0,
 )
@@ -19,6 +22,7 @@ const lambda_optima_3d = Dict(
 )
 
 lambdas_3d = Dict(
+    # 0.5 => [...,],
     1.0 => [1.75, 1.75, 1.75, 1.75, 1.75],
     2.0 => [2.0, 2.0, 2.0, 2.0, 2.0],
     3.0 => [0.75, 0.75, 1.0, 1.25, 1.75],
@@ -43,9 +47,13 @@ function spline(x, y, e; xmin=x[1], xmax=x[end])
     return __x, yfit
 end
 
+### rs = 0.5 ###
+# rs = [0.5]
+# mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
+
 ### rs = 1 ###
-rs = [1.0]
-mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0]
+# rs = [1.0]
+# mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0]
 
 ### rs = 2 ###
 # rs = [2.0]
@@ -62,12 +70,6 @@ mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0]
 ### rs = 5 ###
 # rs = [5.0]
 # mass2 = [0.375, 0.5, 0.625, 0.75, 0.8125, 0.875, 0.9375, 1.0, 1.125, 1.25, 1.5]
-
-dim = 3
-spin = 2
-Fs = [-0.0,]
-beta = [40.0]
-order = [5,]
 
 polarstr = ispolarized ? "_GV_spin_polarized" : ""
 
@@ -223,7 +225,11 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
             end
             axvline(lambda_optimum; linestyle="-", color="dimgray", zorder=-10)
         end
-        if rs == 1.0
+        if rs == 0.5
+            xloc = 2.125
+            yloc = 0.98
+            ylim(0.87, 1.03)
+        elseif rs == 1.0
             if ispolarized
                 xloc = 2.125
                 yloc = 0.98
@@ -313,33 +319,16 @@ if abspath(PROGRAM_FILE) == @__FILE__
     #     push!(error_order, meff_data[:, 3o+4])
     # end
 
-    for _rs in rs
-        meff_total, error_total, mass2_total = [], [], []
-        # for (_rs, _beta, _mass2) in Iterators.product(rs, beta, mass2)
-        for (_beta, _mass2) in Iterators.product(beta, mass2)
-            idx = 0
-            # println(_rs, _beta, _mass2)
-            for i in 1:num_data
-                # if meff_data[i, 1:3] == [_rs, _beta, _mass2]
-                if meff_data[i, 1] == _rs && meff_data[i, 3] == _mass2
-                    idx = i
-                    break
-                end
+    meff_total, error_total, mass2_total = [], [], []
+    for (_rs, _beta, _mass2) in Iterators.product(rs, beta, mass2)
+        idx = 0
+        # println(_rs, _beta, _mass2)
+        for i in 1:num_data
+            # if meff_data[i, 1:3] == [_rs, _beta, _mass2]
+            if meff_data[i, 1] == _rs && meff_data[i, 3] == _mass2
+                idx = i
+                break
             end
-            idx == 0 && continue
-            _order = meff_data[idx, 4]
-            meff, error = [], [], []
-            for o in 1:_order
-                push!(meff, meff_data[idx, 3o+2])
-                push!(error, meff_data[idx, 3o+4])
-            end
-            if _order < order[1]
-                push!(meff, 0.0)
-                push!(error, 0.0)
-            end
-            push!(meff_total, meff)
-            push!(error_total, error)
-            push!(mass2_total, meff_data[idx, 3])
         end
         idx == 0 && continue
         _order = meff_data[idx, 4]
@@ -375,6 +364,5 @@ if abspath(PROGRAM_FILE) == @__FILE__
         push!(error_order, error_total[o, :])
     end
 
-        plot_convergence_v1(meff_order, error_order, mass2_total, rs=_rs)
-    end
+    plot_convergence_v1(meff_order, error_order, mass2_total)
 end
