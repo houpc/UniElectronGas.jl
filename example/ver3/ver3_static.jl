@@ -36,16 +36,21 @@ function ver3_angle(para::ParaMC, diagram;
         kamp=[kamp,],
         kamp2=[kamp2,],
         kwargs...)
-
-    if isnothing(filename) == false
-        jldopen(filename, "a+") do f
-            key = "$(UEG.short(para))"
-            if haskey(f, key)
-                @warn("replacing existing data for $key")
-                delete!(f, key)
+    if (isnothing(result) == false)
+        if (isnothing(filename) == false)
+            jldopen(filename, "a+") do f
+                key = "$(UEG.short(para))"
+                println(key)
+                if haskey(f, key)
+                    @warn("replacing existing data for $key")
+                    delete!(f, key)
+                end
+                f[key] = (kamp, kamp2, [0,], ver3)
             end
-            f[key] = (kamp, kamp2, [0,], ver3)
         end
+        return ver3, result
+    else
+        return nothing, nothing
     end
 
 end

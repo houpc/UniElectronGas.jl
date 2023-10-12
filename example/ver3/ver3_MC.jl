@@ -3,10 +3,10 @@ include("ver3_static.jl")
 
 dim = 3
 
-rs = [1.0,]
+rs = [2.0,]
 # mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
 # mass2 = [2.0,]
-mass2 = [1.0,]
+mass2 = [0.5,]
 # mass2 = [6.0, 8.0, 10.0, 12.0, 14.0]
 # mass2 = [10.5, 11.0]
 # mass2 = [1e-3,]
@@ -16,7 +16,7 @@ Fs = [-0.0,]
 beta = [100.0]
 order = [3,]
 ell = 0
-neval = 1e8
+neval = 1e6
 # isDynamic = true
 isDynamic = false
 isFock = false
