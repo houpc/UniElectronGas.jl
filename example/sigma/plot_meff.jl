@@ -11,7 +11,7 @@ include("../input.jl")
 
 # rₛ ↦ λ*(rₛ), d = 3
 const fixed_lambda_optima_3d = Dict(
-    # 0.5 => ...,
+    0.5 => 3.5,
     1.0 => 1.75,
     2.0 => 2.0,
 )
@@ -22,7 +22,7 @@ const lambda_optima_3d = Dict(
 )
 
 lambdas_3d = Dict(
-    # 0.5 => [...,],
+    0.5 => [3.5, 3.5, 3.5, 3.5, 3.5],
     1.0 => [1.75, 1.75, 1.75, 1.75, 1.75],
     2.0 => [2.0, 2.0, 2.0, 2.0, 2.0],
     3.0 => [0.75, 0.75, 1.0, 1.25, 1.75],
@@ -49,7 +49,7 @@ end
 
 ### rs = 0.5 ###
 # rs = [0.5]
-# mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
+# mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0]
 
 ### rs = 1 ###
 # rs = [1.0]
@@ -143,6 +143,10 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
         yval = collect(valid_meff)
         yerr = collect(valid_errors)
 
+        if o == maxOrder
+            println("\n(N = $o)\nλ = $x\nm*/m = $(measurement.(yval, yerr))\n")
+        end
+
         # println(x)
         # println(yval)
 
@@ -213,11 +217,17 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
         end
     end
     if dim == 3
-        xpad = rs < 3 ? 0.1 : 0.05
+        if rs < 1
+            xpad = 0.2
+        elseif rs < 3
+            xpad = 0.1
+        else
+            xpad = 0.05
+        end
         xlim(xmin_plot - xpad, xmax_plot + xpad)
         ylim(0.855, 1.0)
         # Plot fixed lambda optima for rs = 1, 2 at d = 3
-        if rs in [1.0, 2.0]
+        if rs in [0.5, 1.0, 2.0]
             if ispolarized
                 lambda_optimum = fixed_lambda_optima_3d_GV_spin_polarized[rs]
             else
@@ -226,9 +236,11 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
             axvline(lambda_optimum; linestyle="-", color="dimgray", zorder=-10)
         end
         if rs == 0.5
-            xloc = 2.125
-            yloc = 0.98
-            ylim(0.87, 1.03)
+            xloc = 4.0
+            yloc = 0.9825
+            ylim(0.865, 1.005)
+            # yloc = 1.005
+            # ylim(0.87, 1.03)
         elseif rs == 1.0
             if ispolarized
                 xloc = 2.125
@@ -279,8 +291,14 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
         end
         xmin, xmax = xlim()
         ymin, ymax = ylim()
-        xstep = rs < 4 ? 0.5 : 0.25
-        big_xticks = collect(range(0.0, 5.0, step=xstep))
+        if rs < 1
+            xstep = 1.0
+        elseif rs < 4
+            xstep = 0.5
+        else
+            xstep = 0.25
+        end
+        big_xticks = collect(range(0.0, 7.0, step=xstep))
         big_yticks = collect(range(0.8, 1.2, step=0.025))
         xticks([t for t in big_xticks if xmin <= t <= xmax])
         yticks([t for t in big_yticks if ymin <= t <= ymax])
@@ -292,7 +310,7 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
         "\$r_s = $(rs),\\, \\beta \\hspace{0.1em} \\epsilon_F = $(beta)\$";
         fontsize=16
     )
-    legend(; loc="lower right", ncol=2, columnspacing=0.9)
+    legend(; loc="lower right", ncol=2, columnspacing=rs == 0.5 ? 0.45 : 0.9)
     xlabel("\$\\lambda\$ (Ry)")
     ylabel("\$m^\\star / m\$")
     # plt.tight_layout()

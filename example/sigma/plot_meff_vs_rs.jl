@@ -16,11 +16,29 @@ function spline(x, y, e; xmin=x[1], xmax=x[end])
     return __x, yfit
 end
 
+function spline_with_bc(x, y, e; xmin=0.0, xmax=x[end])
+    _x, _y = deepcopy(x), deepcopy(y)
+    _w = 1.0 ./ e
+
+    #enforce left boundary condition: m*/m → 1 as rs → 0
+    rescale = 10000
+    pushfirst!(_x, 0.0)
+    pushfirst!(_y, 1.0)
+    pushfirst!(_w, _w[1] * rescale)
+
+    # generate knots with spline without constraints
+    spl = interp.UnivariateSpline(_x, _y; w=_w, k=3)
+    __x = collect(LinRange(0.0, x[end], 1000))
+    yfit = spl(__x)
+    return __x, yfit
+end
+
 dim = 3
 spin = 2
 Fs = -0.0
 beta = 40.0
 maxOrder = 5
+rslist = [0.5, 1.0, 2.0, 3.0, 4.0, 5.0]
 
 cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "orange" => "#EE7733", "red" => "#CC3311", "magenta" => "#EE3377", "grey" => "#BBBBBB"]);
 
@@ -34,7 +52,7 @@ cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "or
 
 meff_data = Dict(
     # Fixed lambda for rs < 3
-    # 0.5 => [...,],
+    0.5 => [0.94957 ± 0.00012, 0.95751 ± 0.00013, 0.95808 ± 0.00013, 0.95839 ± 0.00016, 0.95861 ± 0.00041],
     1.0 => [0.93574 ± 0.0001, 0.94731 ± 0.00011, 0.94992 ± 0.00013, 0.95129 ± 0.00025, 0.95109 ± 0.00092],
     2.0 => [0.97009 ± 0.00027, 0.95709 ± 0.00035, 0.95099 ± 0.00041, 0.9504 ± 0.00066, 0.9516 ± 0.0019],
     # Minimal sensitivity for rs ≥ 3
@@ -44,7 +62,7 @@ meff_data = Dict(
     5.0 => [1.0 ± 0.0, 0.96925 ± 0.00068, 0.9696 ± 0.001, 0.9752 ± 0.0015, 0.9766 ± 0.0052],
 )
 lambdas = Dict(
-    # 0.5 => [...,],
+    0.5 => [3.5, 3.5, 3.5, 3.5, 3.5],
     1.0 => [1.75, 1.75, 1.75, 1.75, 1.75],
     2.0 => [2.0, 2.0, 2.0, 2.0, 2.0],
     3.0 => [0.75, 0.75, 1.0, 1.25, 1.75],
@@ -68,7 +86,6 @@ rcParams["font.size"] = 16
 rcParams["font.family"] = "Times New Roman"
 figure(figsize=(6, 4))
 
-rslist = [0.5, 1.0, 2.0, 3.0, 4.0, 5.0]
 for o in 1:maxOrder
     # for o in maxOrder:maxOrder
     yval = [meff_data[rs][o].val for rs in rslist]
@@ -91,21 +108,24 @@ for o in 1:maxOrder
         zorder=10 * o,
     )
     if o > 1
-        xfit, yfit = spline(rslist, yval, yerr)
-        # plot(xfit, yfit; color="black", linestyle="--")
+        xfit, yfit = spline_with_bc(rslist, yval, yerr)
+        # xfit, yfit = spline(rslist, yval, yerr)
         plot(xfit, yfit; color=color[o], linestyle="--")
+        # plot(xfit, yfit; color="black", linestyle="--")
     else
         axhline(1.0; color=color[o], linestyle="--")
     end
 end
 text(
-    3.875,
-    0.945,
+    3.5,
+    0.94,
     "\$\\beta \\hspace{0.1em} \\epsilon_F = $(beta)\$";
     fontsize=16
 )
-legend(; loc=(0.02, 0.45), ncol=2)
-ylim(0.935, 1.005)
+legend(; loc=(0.1, 0.575), ncol=2)
+# xticks(range(0.0, 5.0, step=0.5))
+xlim(-0.2, 5.2)
+ylim(0.93, 1.005)
 xlabel("\$r_s\$")
 ylabel("\$m^\\star / m\$")
 if spin == 2
@@ -115,7 +135,6 @@ else
 end
 
 # Plot meff convergence at each rs
-rslist = [1.0, 2.0, 3.0, 4.0, 5.0]
 for rs in rslist
     figure(figsize=(6, 4))
     orders = 1:maxOrder
@@ -151,9 +170,9 @@ for rs in rslist
     lambdastr = rs < 3 ? ",\\, \\lambda^\\star = $(lambdas[rs][1])" : ""
     yloc = 0.99
     if rs == 0.5
-        yloc=0.9375
+        yloc=0.9505
         xlim(0.75, 5.25)
-        ylim(0.934, 0.956)
+        ylim(0.9485, 0.9605)
     elseif rs == 1.0
         yloc=0.9375
         xlim(0.75, 5.25)
