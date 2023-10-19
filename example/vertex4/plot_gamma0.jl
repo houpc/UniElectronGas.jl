@@ -4,20 +4,24 @@ using DelimitedFiles
 dim = 3
 spin = 2
 # rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
-rs = [1.0, 2.0, 3.0, 4.0, 5.0]
-Fs = -[0.223, 0.380, 0.516, 0.639, 0.752]
+# rs = [1.0, 2.0, 3.0, 4.0, 5.0]
+rs = [2.0]
+Fs = -[0.223, 0.380, 0.516, 0.639, 0.752] * 0.0
 # rs = [1.0]
 ells = [0,]
 # symmetry = true
 symmetry = false
 # mass2 = [1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
-mass2 = [1e-3,]
+# mass2 = [1e-3,]
+# mass2 = [2.0, 2.5, 3.0, 3.5]
+mass2 = [2.5, 3.0]
 # Fs = [-0.0,]
 beta = [100.0]
-order = [2,]
+order = [5,]
 # const fileName = symmetry ? "gs_$(dim)d.dat" : "ga_$(dim)d.dat"
 # const fileName = symmetry ? "gsko_$(dim)d.dat" : "gako_$(dim)d.dat"
-const fileName = symmetry ? "guu_$(dim)d.dat" : "gud_$(dim)d.dat"
+# const fileName = symmetry ? "guu_$(dim)d.dat" : "gud_$(dim)d.dat"
+fileName = "gayuk_3d.dat"
 
 cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "orange" => "#EE7733", "red" => "#CC3311", "magenta" => "#EE3377", "grey" => "#BBBBBB"]);
 
