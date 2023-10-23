@@ -54,3 +54,36 @@ function ver3_angle(para::ParaMC, diagram;
     end
 
 end
+
+function ver3_KW(para::ParaMC, diagram;
+    kin=[getK(para.kF, para.dim, 1),],
+    nkin=[0,],
+    qout=[getK(0.0, para.dim, 1),],
+    nqout=[0,],
+    neval=1e6, #number of evaluations
+    print=0,
+    alpha=3.0, #learning ratio
+    config=nothing,
+    filename=nothing,
+    kwargs...)
+    ver3, result = Ver3.KW(para, diagram;
+        kin=kin,
+        nkin=nkin,
+        qout=qout, nqout=nqout,
+        neval=neval,
+        print=print,
+        alpha=alpha,
+        config=config,
+        kwargs...)
+
+    if isnothing(filename) == false
+        jldopen(filename, "a+") do f
+            key = "$(UEG.short(para))"
+            if haskey(f, key)
+                @warn("replacing existing data for $key")
+                delete!(f, key)
+            end
+            f[key] = (kin, qout, nqout, ver3)
+        end
+    end
+end

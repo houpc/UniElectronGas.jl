@@ -3,8 +3,8 @@ include("ver3_static.jl")
 
 dim = 3
 
-rs = [0.5,]
-mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
+rs = [1.0,]
+mass2 = [2.0, 3.0, 4.0, 5.0]
 # mass2 = [2.0,]
 # mass2 = [,]
 # mass2 = [6.0, 8.0, 10.0, 12.0, 14.0]
@@ -16,12 +16,13 @@ Fs = [-0.0,]
 beta = [100.0]
 order = [3,]
 ell = 0
-neval = 1e6
+neval = 1e7
 # isDynamic = true
 isDynamic = false
 isFock = false
+k1ratiolist = [0.1, 0.5, 0.8, 1.0, 1.2, 1.5, 2.0]
 
-const filename = "data_ver3aa.jld2"
+const filename = "data_ver3q0.jld2"
 
 # anglegrid = [0.0, 0.25π, 0.5π, 0.75π, π]
 anglegrid = [π,]
@@ -46,6 +47,7 @@ for (irs, _mass2, _beta, _order) in Iterators.product([i for i in 1:length(rs)],
 
     # ver3, result = ver3_static(para, diagram, anglegrid; neval=neval, reweight_goal=reweight_goal, filename=filename)
     # ver3, result = ver3_static(para, diagram, anglegrid; neval=neval, filename=filename)
-    ver3, result = ver3_angle(para, diagram; neval=neval, reweight_goal=reweight_goal, filename=filename)
+    # ver3, result = ver3_angle(para, diagram; neval=neval, reweight_goal=reweight_goal, filename=filename)
+    ver3, result = ver3_KW(para, diagram; kin=[getK(para.kF * k1, para.dim, 1) for k1 in k1ratiolist], neval=neval, reweight_goal=reweight_goal, filename=filename)
 
 end
