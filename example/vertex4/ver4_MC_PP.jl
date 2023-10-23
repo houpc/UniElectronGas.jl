@@ -3,22 +3,22 @@ using ElectronLiquid, FeynmanDiagram
 dim = 3
 # rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
 # rs = [1.0, 2.0, 3.0, 4.0, 5.0]
-rs = [0.5,]
+rs = [0.1,]
 # Fs = -[0.223, 0.380, 0.516, 0.639, 0.752]
 # Fs = -[0.223,]
 # mass2 = [1e-3,]
 # mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
-mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
-# mass2 = [2.5, 3.5]
+# mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
+mass2 = [1.0, 2.0, 3.0, 5.0, 9.0, 17.0]
 # mass2 = [3.6, 3.8]
 Fs = [-0.0,]
 # Fs = -0.2 .* rs
 beta = [100.0]
-order = [4,]
+order = [3,]
 # ell = [0, 1]
 ell = 0
-# neval = 2e7
-neval = 1e6
+neval = 1e7
+# neval = 1e8
 # isDynamic = true
 isDynamic = false
 isFock = false
@@ -29,7 +29,8 @@ for (irs, _mass2, _beta, _order) in Iterators.product([i for i in 1:length(rs)],
     _rs = rs[irs]
     para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, isFock=isFock)
     println(UEG.short(para))
-    filename = "data_ver4PP.jld2"
+    # filename = "data_ver4PP.jld2"
+    filename = "data_ver4PP_profile.jld2"
 
     partition = UEG.partition(_order)
     neighbor = UEG.neighbor(partition)

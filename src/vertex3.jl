@@ -26,8 +26,10 @@ function ver3_renormalization(para, filename, dz, dmu)
     for p in keys(ver3)
         println(p)
         if haskey(vuu, p) == false
-            vuu[p] = MeshArray(1, anglegrid; dtype=Complex{Measurement{Float64}})
-            vud[p] = MeshArray(1, anglegrid; dtype=Complex{Measurement{Float64}})
+            vuu[p] = MeshArray(kamp, anglegrid; dtype=Complex{Measurement{Float64}})
+            vud[p] = MeshArray(kamp, anglegrid; dtype=Complex{Measurement{Float64}})
+            # vuu[p] = MeshArray(1, anglegrid; dtype=Complex{Measurement{Float64}})
+            # vud[p] = MeshArray(1, anglegrid; dtype=Complex{Measurement{Float64}})
         end
         vuu[p][:, :] = ver3[p][1, :, :, 1, 1]
         vud[p][:, :] = ver3[p][2, :, :, 1, 1]
