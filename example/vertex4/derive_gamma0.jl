@@ -3,26 +3,26 @@ using JLD2, DelimitedFiles
 
 dim = 3
 spin = 2
-# rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
-# rs = [1.0, 2.0, 3.0, 4.0, 5.0]
+rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+# rs = [1.0, 2.0, 3.0, 4.0]
 # Fs = -[0.223, 0.380, 0.516, 0.639, 0.752]
 # Fs = -[0.223,]
-rs = [1.0,]
+# rs = [1.0,]
 # mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
 # mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
-# mass2 = [1e-3,]
+mass2 = [1e-3,]
 # mass2 = [4.0,]
-# mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+# mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0]
 # mass2 = [2.5, 3.5]
-Fs = [-0.0]
-# Fs = -0.0 .* rs
+# Fs = [-0.0]
+Fs = -0.0 .* rs
 beta = [100.0]
-order = [5,]
+order = [2,]
 Nl = 1
-# isDynamic = true
-isDynamic = false
+isDynamic = true
+# isDynamic = false
 isFock = false
-ω_c = 0.1
+ω_c = 0.005
 
 const parafilename = "para_wn_1minus0.csv"
 const filename = "data_ver4PP.jld2"
@@ -30,10 +30,14 @@ const filename = "data_ver4PP.jld2"
 # const savefilename2 = "gud_$(dim)d.dat"
 # const savefilename1 = "gsko_$(dim)d.dat"
 # const savefilename2 = "gako_$(dim)d.dat"
-const savefilename1 = "gsrpa_$(dim)d.dat"
-const savefilename2 = "garpa_$(dim)d.dat"
+# const savefilename1 = "gsrpa_$(dim)d.dat"
+# const savefilename2 = "garpa_$(dim)d.dat"
 # const savefilename1 = "gsyuk3_$(dim)d.dat"
 # const savefilename2 = "gayuk3_$(dim)d.dat"
+# const savefilename1 = "gsingyuk_$(dim)d.dat"
+# const savefilename2 = "gtripyuk_$(dim)d.dat"
+const savefilename1 = "gsingrpa_$(dim)d.dat"
+const savefilename2 = "gtriprpa_$(dim)d.dat"
 
 function Πs(para; ω_c=0.1)
     return 1 / (2π^2) * para.kF * log(0.882 * ω_c * para.EF * para.β)
@@ -100,8 +104,8 @@ if abspath(PROGRAM_FILE) == @__FILE__
                 for il in 1:Nl
                     # push!(results_s, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_uu[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
                     # push!(results_a, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_ud[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
-                    push!(results_s, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_Fs[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
-                    push!(results_a, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_Fa[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
+                    push!(results_s, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_Fs[o][il, 1] - 3 * data_Fa[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
+                    push!(results_a, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_Fs[o][il, 1] + 3 * data_Fa[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
                 end
             end
         end
