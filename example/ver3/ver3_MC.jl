@@ -4,7 +4,7 @@ include("ver3_static.jl")
 dim = 3
 
 rs = [1.0,]
-mass2 = [2.0, 3.0, 4.0, 5.0]
+mass2 = [5.0, ]
 # mass2 = [2.0,]
 # mass2 = [,]
 # mass2 = [6.0, 8.0, 10.0, 12.0, 14.0]
@@ -16,7 +16,7 @@ Fs = [-0.0,]
 beta = [100.0]
 order = [3,]
 ell = 0
-neval = 1e7
+neval = 1e9
 # isDynamic = true
 isDynamic = false
 isFock = false
@@ -38,7 +38,7 @@ for (irs, _mass2, _beta, _order) in Iterators.product([i for i in 1:length(rs)],
     reweight_goal = Float64[]
     for (order, sOrder, vOrder) in partition
         # order == 1 && sOrder > 0 && continue
-        push!(reweight_goal, 2.0^(2order + sOrder + vOrder - 2))
+        push!(reweight_goal, 4.0^(2order + sOrder + vOrder - 2))
     end
     push!(reweight_goal, 4.0)
     channel = [PHr, PHEr, PPr]
