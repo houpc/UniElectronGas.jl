@@ -14,15 +14,21 @@ function ver3_static(para::ParaMC, diagram, anglegrid;
         qout=qout,
         kwargs...)
 
-    if isnothing(filename) == false
-        jldopen(filename, "a+") do f
-            key = "$(UEG.short(para))"
-            if haskey(f, key)
-                @warn("replacing existing data for $key")
-                delete!(f, key)
+    if (isnothing(result) == false)
+        if (isnothing(filename) == false)
+            jldopen(filename, "a+") do f
+                key = "$(UEG.short(para))"
+                println(key)
+                if haskey(f, key)
+                    @warn("replacing existing data for $key")
+                    delete!(f, key)
+                end
+                f[key] = (kamp, kamp2, anglegrid, ver3)
             end
-            f[key] = (kamp, kamp2, anglegrid, ver3)
         end
+        return ver3, result
+    else
+        return nothing, nothing
     end
 
 end
@@ -76,14 +82,20 @@ function ver3_KW(para::ParaMC, diagram;
         config=config,
         kwargs...)
 
-    if isnothing(filename) == false
-        jldopen(filename, "a+") do f
-            key = "$(UEG.short(para))"
-            if haskey(f, key)
-                @warn("replacing existing data for $key")
-                delete!(f, key)
+    if (isnothing(result) == false)
+        if isnothing(filename) == false
+            jldopen(filename, "a+") do f
+                key = "$(UEG.short(para))"
+                if haskey(f, key)
+                    @warn("replacing existing data for $key")
+                    delete!(f, key)
+                end
+                f[key] = (kin, qout, nqout, ver3)
+                return ver3, result
             end
-            f[key] = (kin, qout, nqout, ver3)
         end
+    else
+        return nothing, nothing
     end
+
 end
