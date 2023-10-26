@@ -112,6 +112,12 @@ for o in 1:maxOrder
         # xfit, yfit = spline(rslist, yval, yerr)
         plot(xfit, yfit; color=color[o], linestyle="--")
         # plot(xfit, yfit; color="black", linestyle="--")
+
+        # Estimate the turning point (local minimum) of the mass ratio to max order
+        if o == maxOrder
+            println("\nTurning point: rs = $(xfit[argmin(yfit)])")
+            println("Effective mass ratio at turning point: $(minimum(yfit))")
+        end
     else
         axhline(1.0; color=color[o], linestyle="--")
     end
