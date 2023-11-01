@@ -285,8 +285,10 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
             yloc = 0.905
             ylim(0.89, 1.005)
         elseif rs == 5.0
-            xloc = 0.525
-            yloc = 0.93
+            # xloc = 0.525
+            # yloc = 0.93
+            xloc = 0.625
+            yloc = 1.0025
             ylim(0.915, 1.02)
         end
         xmin, xmax = xlim()
