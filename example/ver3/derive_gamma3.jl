@@ -8,7 +8,8 @@ spin = 2
 rs = [1.0,]
 # mass2 = [0.5,]
 # mass2 = [1e-3,]
-mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
+mass2 = [2.0, 3.0, 4.0, 5.0]
+# mass2 = [2.0,]
 # mass2 = [6.0, 8.0, 10.0, 12.0, 14.0]
 # mass2 = [10.5, 11.0]
 # mass2 = [3.0,]
@@ -33,8 +34,8 @@ const filename = "data_ver3q0.jld2"
 # const savefilename2 = "v3a_$(dim)d.dat"
 # const savefilename1 = "vaa3s_$(dim)d.dat"
 # const savefilename2 = "vaa3a_$(dim)d.dat"
-const savefilename1 = "vq03s_$(dim)d.dat"
-const savefilename2 = "vq03a_$(dim)d.dat"
+const savefilename1 = "vq03uu_$(dim)d.dat"
+const savefilename2 = "vq03ud_$(dim)d.dat"
 
 if abspath(PROGRAM_FILE) == @__FILE__
     isSave = false
@@ -55,14 +56,15 @@ if abspath(PROGRAM_FILE) == @__FILE__
             if UEG.paraid(loadpara) == UEG.paraid(para)
                 println(UEG.paraid(para))
                 data_Fs, data_Fa = UniElectronGas.getVer3(para, filename)
+		data_uu, data_ud = (data_Fs + data_Fa), (data_Fs - data_Fa)
                 res_s = Any[_rs, _beta, _mass2, _order]
                 # for iθ in 1:Na
                 #     push!(results_s, append!(Any[_rs, _beta, _mass2, _order, anglegrid[iθ]], [(real(data_Fs[o][1, iθ])) for o in 1:_order]))
                 #     push!(results_a, append!(Any[_rs, _beta, _mass2, _order, anglegrid[iθ]], [(real(data_Fa[o][1, iθ])) for o in 1:_order]))
                 # end
                 for ik in 1:Nk
-                    push!(results_s, append!(Any[_rs, _beta, _mass2, _order, k1ratiolist[ik]], [sum(real(data_Fs[o][ik, 1]) for oi in 1:o) for o in 1:_order]))
-                    push!(results_a, append!(Any[_rs, _beta, _mass2, _order, k1ratiolist[ik]], [sum(real(data_Fa[o][ik, 1]) for oi in 1:o) for o in 1:_order]))
+                    push!(results_s, append!(Any[_rs, _beta, _mass2, _order, k1ratiolist[ik]], [sum(real(data_uu[o][ik, 1]) for oi in 1:o) for o in 1:_order]))
+                    push!(results_a, append!(Any[_rs, _beta, _mass2, _order, k1ratiolist[ik]], [sum(real(data_ud[o][ik, 1]) for oi in 1:o) for o in 1:_order]))
                 end
                 # push!(results_s, append!(Any[_rs, _beta, _mass2, _order, 0], [(real(data_Fs[o][1, 1])) for o in 1:_order]))
                 # push!(results_a, append!(Any[_rs, _beta, _mass2, _order, 0], [(real(data_Fa[o][1, 1])) for o in 1:_order]))
