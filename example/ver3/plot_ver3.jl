@@ -3,26 +3,30 @@ using DelimitedFiles
 
 dim = 3
 spin = 2
-# rs = [0.5, 1.0, 4.0]
+# rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+# rs = [1.0, 2.0, 3.0, 4.0, 5.0]
 rs = [1.0]
-# rs = [4.0,]
+Fs = -rs .* 0.0
+# rs = [1.0]
 ells = [0,]
 # symmetry = true
 symmetry = false
-mass2 = [2.0, 2.5, 3.0, 3.5, 4.0, 5.0]
-# mass2 = [2.0, 2.5, 3.0, 3.5, 4.0]
-# mass2 = [1.0, 1.5, 2.0, 2.5, 3.0]
-# mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
-Fs = [-0.0,]
+# mass2 = [1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
+# mass2 = [1e-3,]
+# mass2 = [2.0, 2.5, 3.0, 3.5]
+mass2 = [5.0,]
+# Fs = [-0.0,]
 beta = [100.0]
-order = [5,]
-# const fileName = symmetry ? "Fsl_$(dim)d.dat" : "Fal_$(dim)d.dat"
-# const fileName = "gayuk_3d.dat"
-const fileName = "gsingyuk3_3d_01.dat"
+order = [3,]
+k1ratiolist = [0.1, 0.5, 0.8, 1.0, 1.2, 1.5, 2.0]
+# const fileName = symmetry ? "gs_$(dim)d.dat" : "ga_$(dim)d.dat"
+# const fileName = symmetry ? "gsko_$(dim)d.dat" : "gako_$(dim)d.dat"
+# const fileName = symmetry ? "guu_$(dim)d.dat" : "gud_$(dim)d.dat"
+fileName = "vq03uu_3d.dat"
 
 cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "orange" => "#EE7733", "red" => "#CC3311", "magenta" => "#EE3377", "grey" => "#BBBBBB"]);
 
-function plot_convergence_v1(ver4, errors, _mass2=mass2, maxOrder=order[1]; rs=rs[1], beta=beta[1], ell=ells[1])
+function plot_convergence_v1(ver4, errors, _k1=k1ratiolist, maxOrder=order[1]; mass2=mass2[1], beta=beta[1], ell=ells[1])
     style = PyPlot.matplotlib."style"
     # style.use(["science", "std-colors"])
     style.use(["science"])
@@ -35,25 +39,25 @@ function plot_convergence_v1(ver4, errors, _mass2=mass2, maxOrder=order[1]; rs=r
     figure(figsize=(6, 4))
 
     # x = collect(1:maxOrder)
-    x = _mass2
+    x = _k1
     for o in 1:maxOrder
         yval, yerr = ver4[o], errors[o]
-        reducedx = [x[i] for i in 1:length(x) if yval[i] != 0.0]
-        reducedyerr = [yerr[i] for i in 1:length(x) if yval[i] != 0.0]
-        reducedyval = [yval[i] for i in 1:length(x) if yval[i] != 0.0]
+        # yval = sum.(ver4[i] for i in 1:o)
+        # yerr = sqrt.(sum.(errors[i] .^ 2 for i in 1:o) ./ o)
         # errorbar(x[2:end], yval[2:end], yerr=yerr[2:end], color=color[o], capsize=4, fmt="o", markerfacecolor="none", label="$o")
-        errorbar(reducedx, reducedyval, yerr=reducedyerr, color=color[o], capsize=4, fmt="o-", markerfacecolor="none", label="$o")
+        errorbar(x, yval, yerr=yerr, color=color[o], capsize=4, fmt="-o", markerfacecolor="none", label="$o")
     end
-    # xlim(0.8, 4.5)
-    xlabel("lambda")
-    ylabel("\$U_$(ell)\$")
+    ylim(-0.2, -0.0)
+    xlim(0.0, 2.1)
+    xlabel("\$k_1/k_F\$")
+    ylabel("\$G_3\$")
     legend(title="order")
-    title("rs=$rs, beta=$beta")
+    title("beta=$beta")
     # title(r"$r_s=$(r_, beta=$")
     if symmetry
-        savefig("Us$(dim)d_rs$(rs)_beta$(beta)_l$(ell)_conv.pdf")
+        savefig("v3s$(dim)d_beta$(beta)_l$(ell)_conv.pdf")
     else
-        savefig("Ua$(dim)d_rs$(rs)_beta$(beta)_l$(ell)_invw10.pdf")
+        savefig("v3a$(dim)d_beta$(beta)_l$(ell)_conv.pdf")
     end
 end
 
@@ -63,12 +67,12 @@ if abspath(PROGRAM_FILE) == @__FILE__
     num_data = size(ver4_data)[1]
 
     for _l in ells
-        ver4_total, error_total, mass2_total = [], [], []
-        for (_rs, _beta, _mass2) in Iterators.product(rs, beta, mass2)
+        ver4_total, error_total, rs_total, k1_total = [], [], [], []
+        for (_rs, _beta, _mass2, _k1) in Iterators.product(rs, beta, mass2, k1ratiolist)
             idx = 0
             # println(_rs, _beta, _mass2)
             for i in 1:num_data
-                if ver4_data[i, 1:3] == [_rs, _beta, _mass2] && ver4_data[i, 5] == _l
+                if ver4_data[i, 1:3] == [_rs, _beta, _mass2] && ver4_data[i, 5] == _k1
                     idx = i
                     break
                 end
@@ -82,12 +86,13 @@ if abspath(PROGRAM_FILE) == @__FILE__
             end
             push!(ver4_total, ver4)
             push!(error_total, error)
-            push!(mass2_total, ver4_data[idx, 3])
+            push!(rs_total, ver4_data[idx, 1])
+            push!(k1_total, ver4_data[idx, 5])
         end
-        println(ver4_total)
-        println(error_total)
-        println(mass2_total)
-        # plot_convergence(ver4_total, error_total, mass2_total)
+        # println(ver4_total)
+        # println(error_total)
+        # println(rs_total)
+        # plot_convergence(ver4_total, error_total, rs_total)
 
         ver4_total = hcat(ver4_total...)
         error_total = hcat(error_total...)
@@ -97,6 +102,6 @@ if abspath(PROGRAM_FILE) == @__FILE__
             push!(error_order, error_total[o, :])
         end
 
-        plot_convergence_v1(ver4_order, error_order, mass2_total, ell=_l)
+        plot_convergence_v1(ver4_order, error_order, k1ratiolist, ell=_l)
     end
 end

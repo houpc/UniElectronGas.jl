@@ -4,22 +4,23 @@ using JLD2, DelimitedFiles
 dim = 3
 spin = 2
 # rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
-rs = [0.1,]
+rs = [1.0,]
 # rs = [1.0, 2.0, 3.0, 4.0]
 # Fs = -[0.223, 0.380, 0.516, 0.639, 0.752]
 # Fs = -[0.223,]
 # rs = [1.0,]
-# mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
-# mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
-mass2 = [1.0, 2.0, 3.0, 5.0, 9.0, 17.0]
+# mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0]
+# mass2 = [2.0, 3.0, 3.5, 4.0, 5.0]
+# mass2 = [9.0, 13.0, 19.0, 27.0]
 # mass2 = [1e-3,]
-# mass2 = [4.0,]
+mass2 = [3.5,]
 # mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0]
-# mass2 = [2.5, 3.5]
-Fs = [-0.0,]
-# Fs = 0.0 .* rs
-beta = [100.0]
-order = [3,]
+# mass2 = [2.5,]
+# Fs = [-0.0,]
+Fs = -0.0 .* rs
+beta = [200.0]
+order = [5,]
+# order = [3,]
 Nl = 1
 # isDynamic = true
 isDynamic = false
@@ -27,7 +28,9 @@ isFock = false
 ω_c = 0.1
 
 const parafilename = "para_wn_1minus0.csv"
-const filename = "data_ver4PP_profile.jld2"
+# const filename = "data_ver4PP_profile.jld2"
+const filename = "data_ver4PP_new.jld2"
+# const filename = "data_ver4PP.jld2"
 # const savefilename1 = "guu_$(dim)d.dat"
 # const savefilename2 = "gud_$(dim)d.dat"
 # const savefilename1 = "gsko_$(dim)d.dat"
@@ -36,16 +39,18 @@ const filename = "data_ver4PP_profile.jld2"
 # const savefilename2 = "garpa_$(dim)d.dat"
 # const savefilename1 = "gsyuk3_$(dim)d.dat"
 # const savefilename2 = "gayuk3_$(dim)d.dat"
-# const savefilename1 = "gsingyuk_$(dim)d.dat"
-# const savefilename2 = "gtripyuk_$(dim)d.dat"
-const savefilename1 = "gsingrpa_$(dim)d.dat"
-const savefilename2 = "gtriprpa_$(dim)d.dat"
+const savefilename1 = "gsingyuk3_$(dim)d_001.dat"
+const savefilename2 = "gtripyuk3_$(dim)d_001.dat"
+# const savefilename1 = "gsingrpa_$(dim)d.dat"
+# const savefilename2 = "gtriprpa_$(dim)d.dat"
 
 function Πs(para; ω_c=0.1)
-    return 1 / (2π^2) * para.kF * log(0.882 * ω_c * para.EF * para.β)
+    # return log(0.882 * ω_c * para.beta)
+    return log(ω_c * para.beta)
 end
 
-function Un(Γlist, Π, n)
+function Un(Γlist4, Π, n)
+    Γlist = Γlist4 ./ 4
     result = 0.0
     if n == 1
         result += Γlist[1]
@@ -72,11 +77,13 @@ function Un(Γlist, Π, n)
                    -
                    4 * Γlist[1]^3 * Π^3 * Γlist[2] + Γlist[1]^5 * Π^4)
     end
-    return result
+    return -result
 end
 
 function Γ2U(Γlist, para; ω_c=0.1)
-    Γlist .= -Γlist
+    println(para.EF, para.beta, para.β)
+    # Γlist .= -Γlist
+    # Γlist = [(-1)^i * Γlist[i] for i in 1:length(Γlist)]
     Π = Πs(para; ω_c=ω_c)
     return [Un(Γlist, Π, n) for n in 1:length(Γlist)]
 end
@@ -106,8 +113,13 @@ if abspath(PROGRAM_FILE) == @__FILE__
                 for il in 1:Nl
                     # push!(results_s, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_uu[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
                     # push!(results_a, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_ud[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
-                    push!(results_s, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_Fs[o][il, 1] - 3 * data_Fa[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
-                    push!(results_a, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_Fs[o][il, 1] + 3 * data_Fa[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
+                    if _order == 4
+                        push!(results_s, append!(Any[_rs, _beta, _mass2, _order+1, il-1], Γ2U([real(data_Fs[o][il, 1] - 3 * data_Fa[o][il, 1]) for o in 1:_order], para; ω_c=ω_c), [0.0 * real(data_Fa[1][1, 1])]))
+                        push!(results_a, append!(Any[_rs, _beta, _mass2, _order+1, il-1], Γ2U([real(data_Fs[o][il, 1] + 3 * data_Fa[o][il, 1]) for o in 1:_order], para; ω_c=ω_c), [0.0 * real(data_Fa[1][1, 1])]))
+                    else
+                        push!(results_s, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_Fs[o][il, 1] - 3 * data_Fa[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
+                        push!(results_a, append!(Any[_rs, _beta, _mass2, _order, il-1], Γ2U([real(data_Fs[o][il, 1] + 3 * data_Fa[o][il, 1]) for o in 1:_order], para; ω_c=ω_c)))
+                    end
                 end
             end
         end

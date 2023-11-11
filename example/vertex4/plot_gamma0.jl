@@ -21,7 +21,8 @@ order = [5,]
 # const fileName = symmetry ? "gs_$(dim)d.dat" : "ga_$(dim)d.dat"
 # const fileName = symmetry ? "gsko_$(dim)d.dat" : "gako_$(dim)d.dat"
 # const fileName = symmetry ? "guu_$(dim)d.dat" : "gud_$(dim)d.dat"
-fileName = "gayuk_3d.dat"
+# fileName = "gayuk_3d.dat"
+fileName = "gsingyuk3_3d_01.dat"
 
 cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "orange" => "#EE7733", "red" => "#CC3311", "magenta" => "#EE3377", "grey" => "#BBBBBB"]);
 
