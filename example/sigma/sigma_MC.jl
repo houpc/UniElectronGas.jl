@@ -30,17 +30,7 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
         error("unknown mission")
     end
 
-    if isLayered2D
-        filename = joinpath(data_directory, "data$(dim)d_$(mission)_$(diagGenerate)_layered.jld2")
-    elseif ispolarized
-        @assert diagGenerate == :GV
-        filename = joinpath(data_directory, "data$(dim)d_$(mission)_GV_spin_polarized.jld2")
-    else
-        # filename = joinpath(data_directory, "data$(dim)d_$(mission).jld2")
-        filename = joinpath(data_directory, "data$(dim)d_$(mission)_$(diagGenerate).jld2")
-    end
-    # filename = "data$(dim)_$(mission).jld2"
-
+    filename = mission == "Z" ? sigma_z_filename : sigma_k_filename
     sigma, result = Sigma.MC(para; kgrid=kgrid, ngrid=ngrid, spinPolarPara=spinPolarPara,
         neval=neval, filename=filename,
         isLayered2D=isLayered2D,
