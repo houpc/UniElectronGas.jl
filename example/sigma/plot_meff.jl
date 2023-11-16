@@ -230,10 +230,9 @@ function plot_all_order_convergence(; plot_rs=[1.0, 5.0], beta=beta[1])
 
             valid_means = collect(skipmissing(means))
             valid_errors = collect(skipmissing(errors))
-            x = reverse(1.0 ./ collect(eachindex(valid_means)))
-            yval = reverse(valid_means)
-            yerr = reverse(valid_errors)
-            # fmt = i == 3 ? "o" : "o--"
+            x = collect(eachindex(valid_means))
+            yval = valid_means
+            yerr = valid_errors
             fmt = "o--"
             errorbar(
                 x,
@@ -246,11 +245,12 @@ function plot_all_order_convergence(; plot_rs=[1.0, 5.0], beta=beta[1])
                 zorder=10 * i,
             )
         end
-        ylim(0.84, 1.26)
-        xlabel("\$1/N\$")
-        legend(; title="\$r_s = $(rs)\$", loc="upper right", ncol=1, columnspacing=0.45)
+        ylim(0.84, 1.3)
+        xticks(collect(1:order[1]))
+        xlabel("Perturbation order \$N\$")
+        legend(; title="\$r_s = $(rs)\$", loc="upper left", ncol=1, columnspacing=0.45)
     end
-    savefig("meff$(dim)d_rs$(plot_rs)_beta$(beta)$(modestr)_with_cancellations_vs_Ninv.pdf")
+    savefig("meff$(dim)d_rs$(plot_rs)_beta$(beta)$(modestr)_with_cancellations_vs_N.pdf")
 end
 
 function plot_meff_order_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
@@ -258,13 +258,13 @@ function plot_meff_order_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
 
     # Plot convergence for lambda points with max order data
     figure(figsize=(6, 4))
-    x = reverse(1 ./ collect(1:maxOrder))
+    x = collect(1:maxOrder)
     ic = 1
     for (i, lambda) in enumerate(_mass2)
         any(ismissing.(meff_means[i])) && continue
         lambda ∉ lambdas_meff_convergence_plot_3d[rs] && continue
-        yval = reverse(meff_means[i])
-        yerr = reverse(meff_errors[i])
+        yval = meff_means[i]
+        yerr = meff_errors[i]
         errorbar(
             x,
             yval,
@@ -280,18 +280,18 @@ function plot_meff_order_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
         # println("(m*/m)_max = $(x[end]) ± $(yerr[end])")
         ic += 1
     end
-    xlabel("\$1/N\$")
+    xlabel("Perturbation order \$N\$")
     ylabel("\$m^\\star / m\$")
     if rs == 1.0
-        loc = "upper left"
+        loc = "upper right"
         ncol = 2
-        ylim(0.932, 0.98)
+        ylim(0.932, 0.97)
     elseif rs == 5.0
         loc = "best"
         ncol = 1
     end
     legend(; title="\$r_s = $(rs)\$", loc=loc, ncol=ncol)
-    savefig("meff$(dim)d_rs$(rs)_beta$(beta)$(modestr)_vs_Ninv.pdf")
+    savefig("meff$(dim)d_rs$(rs)_beta$(beta)$(modestr)_vs_N.pdf")
 end
 
 function plot_meff_lambda_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
