@@ -62,41 +62,13 @@ const fixed_lambda_optima_3d = Dict(
 # NOTE: At rs = 5, λ* itself is the largest calculated λ, so we compare with smaller λ = 0.875
 const lambdas_meff_convergence_plot_3d = Dict(
     0.5 => [3.5, 5.0],
-    1.0 => [1.75, 2.0, 3.0, 3.5],
+    1.0 => [1.75, 2.0],
     2.0 => [2.0, 2.5],
     3.0 => [1.5, 2.0],
     4.0 => [1.125, 1.5],
-    5.0 => [0.875, 1.125],
+    5.0 => [1.125, 0.875],
     6.0 => [missing, missing],
 )
-
-### rs = 0.5 ###
-# rs = [0.5]
-# mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0]
-
-### rs = 1 ###
-# rs = [1.0]
-# mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0]
-
-### rs = 2 ###
-# rs = [2.0]
-# mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.625, 1.75, 1.875, 2.0, 2.5, 3.0]
-
-### rs = 3 ###
-# rs = [3.0]
-# mass2 = [0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.5, 1.75, 2.0]
-
-### rs = 4 ###
-# rs = [4.0]
-# mass2 = [0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.5, 2.0]
-
-### rs = 5 ###
-# rs = [5.0]
-# mass2 = [0.375, 0.5, 0.625, 0.75, 0.8125, 0.875, 0.9375, 1.0, 1.125, 1.25, 1.5]
-
-### rs = 6 ###
-# rs = [6.0]
-# mass2 = [0.375, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 3.0, 4.0, 5.0]
 
 function spline(x, y, e; xmin=0.0, xmax=x[end])
     # generate knots with spline without constraints
@@ -126,7 +98,7 @@ end
 
 # NOTE: assumes the following row format: 
 #       | rs | beta | mass2 | order | mean_1 ± error_1 | ... | mean_N ± error_N |
-function load_from_dlm(filename, mass2; rs=rs[1], beta=beta[1])
+function load_from_dlm(filename, mass2; rs=rs[1], beta=beta[1], verbose=false)
     data = readdlm(filename)
     num_data = size(data)[1]
     idx = 0
@@ -151,12 +123,14 @@ function load_from_dlm(filename, mass2; rs=rs[1], beta=beta[1])
     mean_total = mean
     error_total = error
     mass2_total = data[idx, 3]
-    println(mean_total)
-    println(error_total)
-    println(mass2_total)
+    if verbose
+        println(mean_total)
+        println(error_total)
+        println(mass2_total)
+    end
     return mean_total, error_total, mass2_total
 end
-function load_from_dlm(filename; rs=rs[1], beta=beta[1], sortby="order")
+function load_from_dlm(filename; rs=rs[1], beta=beta[1], sortby="order", verbose=false)
     @assert sortby in ["order", "mass2"]
 
     data = readdlm(filename)
@@ -186,9 +160,11 @@ function load_from_dlm(filename; rs=rs[1], beta=beta[1], sortby="order")
         push!(error_total, error)
         push!(mass2_total, data[idx, 3])
     end
-    println(mean_total)
-    println(error_total)
-    println(mass2_total)
+    if verbose
+        println(mean_total)
+        println(error_total)
+        println(mass2_total)
+    end
 
     if sortby == "order"
         mt = hcat(mean_total...)
@@ -204,94 +180,124 @@ function load_from_dlm(filename; rs=rs[1], beta=beta[1], sortby="order")
     end
 end
 
-function plot_all_order_convergence(; plot_rs=[1.0, 5.0], beta=beta[1])
-    figure(figsize=(8, 4))
-    for (i, rs) in enumerate(plot_rs)
-        @assert rs ∈ keys(fixed_lambda_optima_3d) "λ* not defined for rs = $(rs)"
-        lambda = fixed_lambda_optima_3d[rs]
+function plot_all_order_convergence(; beta=beta[1])
+    plot_rs = [1.0, 5.0]
+    plot_lambda = [fixed_lambda_optima_3d[rs] for rs in plot_rs]
 
-        subplot(1, length(plot_rs), i)
+    num_rs = length(plot_rs)
+    figure(figsize=(4 * num_rs, 4))
+    label_locs = [(1.0, 0.875), (3.8, 1.055), (2.6, 0.925)]
+    labels = [
+        "\$(1 + \\delta m)^{-1}\$",
+        "\$(1 - \\delta s)\$",
+        "\$m^\\star / m\$",
+        # "\$(1 + \\delta m)\$",
+    ]
+    for (i, (rs, lambda)) in enumerate(zip(plot_rs, plot_lambda))
+        ax = subplot(1, num_rs, i)
         filenames = [
             inverse_dispersion_ratio_filename,
             zinv_filename,
             meff_filename,
             # dispersion_ratio_filename,
         ]
-        labels = [
-            "\$(1 + \\delta m)^{-1}\$",
-            "\$(1 - \\delta s)\$",
-            "\$m^\\star / m\$",
-            # "\$(1 + \\delta m)\$",
-        ]
         ics = [2, 3, 1]
-        axhline(1.0; linestyle="-", color=cdict["grey"], linewidth=1, zorder=-10)
-        for (i, (filename, label, ic)) in enumerate(zip(filenames, labels, ics))
+        # ics = [1]
+        for (j, (filename, ic)) in enumerate(zip(filenames, ics))
             means, errors, lambda = load_from_dlm(filename, lambda; rs=rs)
-
             valid_means = collect(skipmissing(means))
             valid_errors = collect(skipmissing(errors))
             x = collect(eachindex(valid_means))
             yval = valid_means
             yerr = valid_errors
-            fmt = "o--"
             errorbar(
                 x,
                 yval,
                 yerr=yerr,
                 color=color[ic],
                 capsize=4,
-                fmt=fmt,
-                label=label,
-                zorder=10 * i,
+                fmt="o--",
+                zorder=10 * j,
             )
+            if i == 1
+                println(labels[j], " ", label_locs[j])
+                ax.annotate(labels[j], xy=label_locs[j], xycoords="data")
+            end
+            if j == 3
+                # Rough estimate of total error
+                d1 = abs(yval[end] - yval[end-1])
+                d2 = abs(yval[end] - yval[end-2])
+                error_estimate = yerr[end] + max(d1, d2)
+                meff_estimate = measurement(yval[end], error_estimate)
+                axhspan(
+                    yval[end] - error_estimate,
+                    yval[end] + error_estimate;
+                    color=cdict["grey"],
+                )
+                axhline(yval[end]; linestyle="--", color="dimgrey")
+                println("rs = $rs, λ = $lambda:\tm*/m ≈ $meff_estimate")
+            end
         end
-        ylim(0.84, 1.3)
         xticks(collect(1:order[1]))
         xlabel("Perturbation order \$N\$")
-        legend(; title="\$r_s = $(rs)\$", loc="upper left", ncol=1, columnspacing=0.45)
+        legend(; title="\$r_s = $(Int(rs))\$", loc="upper left")
     end
+    tight_layout()
     savefig("meff$(dim)d_rs$(plot_rs)_beta$(beta)$(modestr)_with_cancellations_vs_N.pdf")
 end
 
-function plot_meff_order_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
-    meff_means, meff_errors, _mass2 = load_from_dlm(meff_filename; sortby="mass2")
-
-    # Plot convergence for lambda points with max order data
-    figure(figsize=(6, 4))
-    x = collect(1:maxOrder)
-    ic = 1
-    for (i, lambda) in enumerate(_mass2)
-        any(ismissing.(meff_means[i])) && continue
-        lambda ∉ lambdas_meff_convergence_plot_3d[rs] && continue
-        yval = meff_means[i]
-        yerr = meff_errors[i]
-        errorbar(
-            x,
-            yval,
-            yerr=yerr,
-            capsize=4,
-            fmt="o--",
-            color=color[ic],
-            markerfacecolor="none",
-            label="\$\\lambda = $(_mass2[i])\$",
-            zorder=10 * i,
-        )
-        # println("\n(λ = $(_mass2[i]))\n")
-        # println("(m*/m)_max = $(x[end]) ± $(yerr[end])")
-        ic += 1
+function plot_meff_order_convergence(;
+    beta=beta[1],
+    plot_rs=range(1.0, 5.0),
+    plot_lambdas=[lambdas_meff_convergence_plot_3d[rs] for rs in plot_rs],
+)
+    num_rs = length(plot_rs)
+    figure(figsize=(4 * num_rs, 4))
+    for (i, (rs, lambdas)) in enumerate(zip(plot_rs, plot_lambdas))
+        subplot(1, num_rs, i)
+        for (j, lambda) in enumerate(lambdas)
+            means, errors, lambda = load_from_dlm(meff_filename, lambda; rs=rs)
+            valid_means = collect(skipmissing(means))
+            valid_errors = collect(skipmissing(errors))
+            x = collect(eachindex(valid_means))
+            yval = valid_means
+            yerr = valid_errors
+            starstr = j == 1 ? "^\\star" : ""
+            errorbar(
+                x,
+                yval,
+                yerr=yerr,
+                color=color[j+1],
+                capsize=4,
+                fmt="o--",
+                label="\$\\lambda$starstr = $lambda\$",
+                zorder=10 * j,
+            )
+            # Rough estimate of total error
+            d1 = abs(yval[end] - yval[end-1])
+            d2 = abs(yval[end] - yval[end-2])
+            error_estimate = yerr[end] + max(d1, d2)
+            meff_estimate = measurement(yval[end], error_estimate)
+            axhspan(
+                yval[end] - error_estimate,
+                yval[end] + error_estimate;
+                color=color[j+1],
+                alpha=0.2,
+            )
+            axhline(yval[end]; linestyle="-", color=color[j+1], alpha=0.6)
+            if lambda == fixed_lambda_optima_3d[rs]
+                println("rs = $rs, λ = $lambda:\tm*/m ≈ $meff_estimate")
+            end
+        end
+        xticks(collect(1:order[1]))
+        xlabel("Perturbation order \$N\$")
+        if i == 1
+            ylabel("\$m^\\star / m\$")
+        end
+        legend(; title="\$r_s = $(rs)\$", loc="best")
     end
-    xlabel("Perturbation order \$N\$")
-    ylabel("\$m^\\star / m\$")
-    if rs == 1.0
-        loc = "upper right"
-        ncol = 2
-        ylim(0.932, 0.97)
-    elseif rs == 5.0
-        loc = "best"
-        ncol = 1
-    end
-    legend(; title="\$r_s = $(rs)\$", loc=loc, ncol=ncol)
-    savefig("meff$(dim)d_rs$(rs)_beta$(beta)$(modestr)_vs_N.pdf")
+    tight_layout()
+    savefig("meff$(dim)d_rs$(plot_rs)_beta$(beta)$(modestr)_vs_N.pdf")
 end
 
 function plot_meff_lambda_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
@@ -309,8 +315,6 @@ function plot_meff_lambda_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
         x = mass2[idx_valid_mass2]
         yval = collect(valid_meff)
         yerr = collect(valid_errors)
-
-        # Plot order-by-order lambda optima for rs > 2 at d = 3
         errorbar(
             x,
             yval,
@@ -442,6 +446,6 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     plot_all_order_convergence()
-    plot_meff_order_convergence()
     plot_meff_lambda_convergence()
+    plot_meff_order_convergence(plot_rs=[0.5, 1.0, 2.0, 3.0, 4.0, 5.0])
 end
