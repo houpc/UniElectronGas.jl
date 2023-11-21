@@ -1,12 +1,16 @@
 dim = 3 # dimension of the problem
 
+### rs = 0.5 ###
+rs = [0.5]
+mass2 = [3.5]
+
 ### rs = 1 ###
 # rs = [1.0]
 # mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 3.5, 4.0]  # screening parameter
 
 ### rs = 2 ###
-rs = [2.0]
-mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.625, 1.75, 1.875, 2.0, 2.5, 3.0]  # screening parameter
+# rs = [2.0]
+# mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.625, 1.75, 1.875, 2.0, 2.5, 3.0]  # screening parameter
 
 ### rs = 3 ###
 # rs = [3.0]
@@ -26,13 +30,11 @@ mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.625, 1.75, 1.875, 2.0, 2.5, 3.0]  # screen
 
 Fs = [-0.0]    # Fermi liquid parameter with zero angular momentum
 beta = [40.0]   # inverse temperature beta = β*E_F 
-order = [4]    # order of diagrams
-# order = [5]    # order of diagrams
-neval = 1e11    # number of Monte Carlo samples
+order = [5]    # order of diagrams
+neval = 1e8    # number of Monte Carlo samples
 isDynamic = false # whether to use effective field theory with dynamic screening or not 
 isFock = false # whether to use Fock renormalization or not
 
-# diagGenerate = :Parquet # :GV or :Parquet, algorithm to generate diagrams
 diagGenerate = :GV # :GV or :Parquet, algorithm to generate diagrams
 isLayered2D = false # whether to use layered 2D system or not
 
