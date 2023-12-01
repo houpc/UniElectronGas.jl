@@ -5,12 +5,12 @@ dim = 3 # dimension of the problem
 # mass2 = [3.5]  # screening parameter
 
 ### rs = 1 ###
-rs = [1.0]
-mass2 = [1.75]  # screening parameter
+# rs = [1.0]
+# mass2 = [1.75]  # screening parameter
 
 ### rs = 2 ###
-# rs = [2.0]
-# mass2 = [2.0]  # screening parameter
+rs = [2.0]
+mass2 = [2.125]  # screening parameter
 
 ### rs = 3 ###
 # rs = [3.0]
@@ -41,6 +41,8 @@ isLayered2D = false # whether to use layered 2D system or not
 spin = 2    # 2 for unpolarized, 1 for polarized
 spinPolarPara = 2 / spin - 1 # spin-polarization parameter (n_up - n_down) / (n_up + n_down) ∈ [0,1]
 ispolarized = spinPolarPara != 0.0
+
+println("rs = $rs, mass2 = $mass2, order = $order, neval = $neval")
 
 # Build file base names
 basenames = [
@@ -81,7 +83,7 @@ para_directory = ""  # src directory
 
 # File paths
 const parafilename = joinpath(para_directory, para_basename * ".csv")
-const simga_z_filename = joinpath(data_directory, sigma_z_basename * ".jld2")
+const sigma_z_filename = joinpath(data_directory, sigma_z_basename * ".jld2")
 const sigma_k_filename = joinpath(data_directory, sigma_k_basename * ".jld2")
 const meff_filename = joinpath(res_directory, meff_basename * ".dat")
 const zfactor_filename = joinpath(res_directory, zfactor_basename * ".dat")
