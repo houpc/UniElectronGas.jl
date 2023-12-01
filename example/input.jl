@@ -1,8 +1,8 @@
 dim = 3 # dimension of the problem
 
 ### rs = 0.5 ###
-rs = [0.5]
-mass2 = [3.5]
+# rs = [0.5]
+# mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0]  # screening parameter
 
 ### rs = 1 ###
 # rs = [1.0]
@@ -26,12 +26,12 @@ mass2 = [3.5]
 
 ### rs = 6 ###
 # rs = [6.0]
-# mass2 = [0.375, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 3.0, 4.0, 5.0]  # screening parameter
+# mass2 = [0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.25, 1.5, 1.75, 2.0]  # screening parameter
 
 Fs = [-0.0]    # Fermi liquid parameter with zero angular momentum
 beta = [40.0]   # inverse temperature beta = β*E_F 
 order = [5]    # order of diagrams
-neval = 1e8    # number of Monte Carlo samples
+neval = 1e11    # number of Monte Carlo samples
 isDynamic = false # whether to use effective field theory with dynamic screening or not 
 isFock = false # whether to use Fock renormalization or not
 
@@ -50,6 +50,7 @@ basenames = [
     "meff_$(dim)d",
     "zfactor_$(dim)d",
     "inverse_zfactor_$(dim)d",
+    "chemical_potential_$(dim)d",
     "dispersion_ratio_$(dim)d",
     "inverse_dispersion_ratio_$(dim)d",
 ]
@@ -71,6 +72,7 @@ sigma_k_basename,
 meff_basename,
 zfactor_basename,
 inverse_zfactor_basename,
+chemical_potential_basename,
 dispersion_ratio_basename,
 inverse_dispersion_ratio_basename = basenames
 
@@ -81,10 +83,11 @@ para_directory = ""  # src directory
 
 # File paths
 const parafilename = joinpath(para_directory, para_basename * ".csv")
-const simga_z_filename = joinpath(data_directory, sigma_z_basename * ".jld2")
+const sigma_z_filename = joinpath(data_directory, sigma_z_basename * ".jld2")
 const sigma_k_filename = joinpath(data_directory, sigma_k_basename * ".jld2")
 const meff_filename = joinpath(res_directory, meff_basename * ".dat")
 const zfactor_filename = joinpath(res_directory, zfactor_basename * ".dat")
 const zinv_filename = joinpath(res_directory, inverse_zfactor_basename * ".dat")
+const chemical_potential_filename = joinpath(res_directory, chemical_potential_basename * ".dat")
 const dispersion_ratio_filename = joinpath(res_directory, dispersion_ratio_basename * ".dat")
 const inverse_dispersion_ratio_filename = joinpath(res_directory, inverse_dispersion_ratio_basename * ".dat")

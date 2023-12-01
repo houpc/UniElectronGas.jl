@@ -3,7 +3,7 @@ using JLD2, DelimitedFiles
 
 include("../input.jl")
 
-function zfactor_renorm(dz, dzinv; isRenorm=true)
+function zfactor_renorm(dz, dzinv; isRenorm=false)
     if isRenorm
         sumzinv = accumulate(+, dzinv)
         return @. 1.0 / (1.0 + sumzinv)
@@ -14,7 +14,7 @@ function zfactor_renorm(dz, dzinv; isRenorm=true)
 end
 
 function process(para, datatuple, isSave)
-    dz, dzinv, dmu = UniElectronGas.get_dzmu(para, datatuple; parafile=parafilename, verbose=1, isSave)
+    dz, dzinv, dmu = UniElectronGas.get_dzmu(para, datatuple; parafile=parafilename, verbose=1, isSave=isSave)
 
     z = zfactor_renorm(dz, dzinv)
     println("Zfactor: ", z)
@@ -29,7 +29,6 @@ if abspath(PROGRAM_FILE) == @__FILE__
     end
 
     f = jldopen(sigma_z_filename, "r")
-    println(sigma_z_filename)
     results = Any[]
     for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
         para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, spin=spin)

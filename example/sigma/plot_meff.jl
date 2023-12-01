@@ -52,9 +52,10 @@ const fixed_lambda_optima_3d = Dict(
     1.0 => 1.75,
     2.0 => 2.0,
     3.0 => 1.5,
-    4.0 => 1.125,
+    4.0 => 1.25,
+    # 4.0 => 1.125,
     5.0 => 1.125,
-    6.0 => missing,
+    6.0 => Inf,
 )
 
 # Two lambda points to plot for convergence tests
@@ -65,9 +66,10 @@ const lambdas_meff_convergence_plot_3d = Dict(
     1.0 => [1.75, 2.0],
     2.0 => [2.0, 2.5],
     3.0 => [1.5, 2.0],
-    4.0 => [1.125, 1.5],
+    4.0 => [1.25, 1.5],
+    # 4.0 => [1.125, 1.5],
     5.0 => [1.125, 0.875],
-    6.0 => [missing, missing],
+    6.0 => [0.75, 0.875],
 )
 
 function spline(x, y, e; xmin=0.0, xmax=x[end])
@@ -102,10 +104,14 @@ function load_from_dlm(filename, mass2; rs=rs[1], beta=beta[1], verbose=false)
     data = readdlm(filename)
     num_data = size(data)[1]
     idx = 0
+    currMaxOrder = 0
     for i in 1:num_data
         if data[i, 1] == rs && data[i, 3] == mass2
             idx = i
-            break
+            if data[i, 4] > currMaxOrder > 0
+                println("(lambda = $(mass2)) Promoting from order $(currMaxOrder) to $(data[i, 4])")
+                currMaxOrder = data[i, 4]
+            end
         end
     end
     @assert idx != 0 "Data for rs = $(rs), mass2 = $(mass2) not found in file $(filename)"
@@ -138,10 +144,14 @@ function load_from_dlm(filename; rs=rs[1], beta=beta[1], sortby="order", verbose
     mean_total, error_total, mass2_total = [], [], []
     for _mass2 in mass2
         idx = 0
+        currMaxOrder = 0
         for i in 1:num_data
             if data[i, 1] == rs && data[i, 3] == _mass2
                 idx = i
-                break
+                if data[i, 4] > currMaxOrder > 0
+                    println("(lambda = $(_mass2)) Promoting from order $(currMaxOrder) to $(data[i, 4])")
+                    currMaxOrder = data[i, 4]
+                end
             end
         end
         idx == 0 && continue
@@ -336,6 +346,7 @@ function plot_meff_lambda_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
             println("\n(N = $o)\nλ = $x\nm*/m = $(measurement.(yval, yerr))\n")
         end
     end
+    ncol = 1
     if dim == 3
         if rs < 1
             xpad = 0.2
@@ -358,10 +369,14 @@ function plot_meff_lambda_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
             axvline(lambda_optimum; linestyle="-", color="dimgray", zorder=-10)
         end
         if rs == 0.5
+            columnspacing = 0.45
+            ncol = 1
             xloc = 4.0
             yloc = 0.9825
             ylim(0.865, 1.005)
         elseif rs == 1.0
+            columnspacing = 0.9
+            ncol = 1
             if ispolarized
                 xloc = 2.125
                 yloc = 0.98
@@ -393,24 +408,35 @@ function plot_meff_lambda_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
                 )
             end
         elseif rs == 2.0
+            columnspacing = 0.9
+            ncol = 1
             xloc = 0.75
             yloc = 0.9825
             ylim(0.865, 1.005)
         elseif rs == 3.0
+            columnspacing = 0.9
+            ncol = 1
             xloc = 0.6
             yloc = 0.8825
             ylim(0.865, 1.005)
         elseif rs == 4.0
-            xloc = 0.625
+            columnspacing = 0.9
+            ncol = 1
+            xloc = 0.45
             yloc = 0.905
             ylim(0.89, 1.005)
         elseif rs == 5.0
+            columnspacing = 1.8
+            ncol = 1
             xloc = 0.55
             yloc = 1.0025
             ylim(0.915, 1.02)
         elseif rs == 6.0
-            xloc = 2.5
-            yloc = 0.985
+            columnspacing = 0.9
+            ncol = 2
+            xloc = 0.75
+            yloc = 1.0
+            xlim(0.3, 2.1)
             ylim(0.965, 1.005)
         end
         xmin, xmax = xlim()
@@ -431,14 +457,7 @@ function plot_meff_lambda_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
         "\$r_s = $(rs),\\, \\beta \\hspace{0.1em} \\epsilon_F = $(beta)\$";
         fontsize=16
     )
-    if rs == 0.5
-        columnspacing = 0.45
-    elseif rs == 5.0
-        columnspacing = 1.8
-    else
-        columnspacing = 0.9
-    end
-    legend(; loc="lower right", ncol=2, columnspacing=columnspacing)
+    legend(; loc="lower right", ncol=ncol, columnspacing=columnspacing)
     xlabel("\$\\lambda\$ (Ry)")
     ylabel("\$m^\\star / m\$")
     savefig("meff$(dim)d_rs$(rs)_beta$(beta)$(modestr)_vs_lambda.pdf")
@@ -448,4 +467,5 @@ if abspath(PROGRAM_FILE) == @__FILE__
     plot_all_order_convergence()
     plot_meff_lambda_convergence()
     plot_meff_order_convergence(plot_rs=[0.5, 1.0, 2.0, 3.0, 4.0, 5.0])
+    # plot_meff_order_convergence(plot_rs=[0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
 end
