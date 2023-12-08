@@ -51,11 +51,12 @@ const fixed_lambda_optima_3d = Dict(
     0.5 => 3.5,
     1.0 => 1.75,
     2.0 => 2.0,
+    # 2.0 => 2.25,
     3.0 => 1.5,
     4.0 => 1.25,
     # 4.0 => 1.125,
     5.0 => 1.125,
-    6.0 => Inf,
+    6.0 => 1.0,
 )
 
 # Two lambda points to plot for convergence tests
@@ -64,12 +65,12 @@ const fixed_lambda_optima_3d = Dict(
 const lambdas_meff_convergence_plot_3d = Dict(
     0.5 => [3.5, 5.0],
     1.0 => [1.75, 2.0],
-    2.0 => [2.0, 2.5],
+    2.0 => [2.0, 2.25],
     3.0 => [1.5, 2.0],
     4.0 => [1.25, 1.5],
     # 4.0 => [1.125, 1.5],
     5.0 => [1.125, 0.875],
-    6.0 => [0.75, 0.875],
+    6.0 => [1.0, 0.75],
 )
 
 function spline(x, y, e; xmin=0.0, xmax=x[end])
@@ -234,7 +235,7 @@ function plot_all_order_convergence(; beta=beta[1])
                 ax.annotate(labels[j], xy=label_locs[j], xycoords="data")
             end
             if j == 3
-                # Rough estimate of total error
+                # Rough estimate of total error using the last 3 orders
                 d1 = abs(yval[end] - yval[end-1])
                 d2 = abs(yval[end] - yval[end-2])
                 error_estimate = yerr[end] + max(d1, d2)
@@ -283,7 +284,7 @@ function plot_meff_order_convergence(;
                 label="\$\\lambda$starstr = $lambda\$",
                 zorder=10 * j,
             )
-            # Rough estimate of total error
+            # Rough estimate of total error using the last 3 orders
             d1 = abs(yval[end] - yval[end-1])
             d2 = abs(yval[end] - yval[end-2])
             error_estimate = yerr[end] + max(d1, d2)
@@ -434,7 +435,7 @@ function plot_meff_lambda_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
         elseif rs == 6.0
             columnspacing = 0.9
             ncol = 2
-            xloc = 0.75
+            xloc = 1.125
             yloc = 1.0
             xlim(0.3, 2.1)
             ylim(0.965, 1.005)
@@ -466,6 +467,5 @@ end
 if abspath(PROGRAM_FILE) == @__FILE__
     plot_all_order_convergence()
     plot_meff_lambda_convergence()
-    plot_meff_order_convergence(plot_rs=[0.5, 1.0, 2.0, 3.0, 4.0, 5.0])
-    # plot_meff_order_convergence(plot_rs=[0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    plot_meff_order_convergence(plot_rs=[0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
 end

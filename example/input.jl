@@ -10,7 +10,8 @@ dim = 3 # dimension of the problem
 
 ### rs = 2 ###
 rs = [2.0]
-mass2 = [2.125]  # screening parameter
+# mass2 = [2.25]  # screening parameter
+mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.625, 1.75, 1.875, 2.0, 2.125, 2.25, 2.5, 3.0]
 
 ### rs = 3 ###
 # rs = [3.0]
@@ -26,7 +27,8 @@ mass2 = [2.125]  # screening parameter
 
 ### rs = 6 ###
 # rs = [6.0]
-# mass2 = [0.75]  # screening parameter
+# mass2 = [1.0, 1.125, 1.25]
+# mass2 = [0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.5, 1.75, 2.0]  # screening parameter
 
 Fs = [-0.0]    # Fermi liquid parameter with zero angular momentum
 beta = [40.0]   # inverse temperature beta = β*E_F 
@@ -52,6 +54,7 @@ basenames = [
     "meff_$(dim)d",
     "zfactor_$(dim)d",
     "inverse_zfactor_$(dim)d",
+    "chemical_potential_$(dim)d",
     "dispersion_ratio_$(dim)d",
     "inverse_dispersion_ratio_$(dim)d",
 ]
@@ -73,6 +76,7 @@ sigma_k_basename,
 meff_basename,
 zfactor_basename,
 inverse_zfactor_basename,
+chemical_potential_basename,
 dispersion_ratio_basename,
 inverse_dispersion_ratio_basename = basenames
 
@@ -88,5 +92,6 @@ const sigma_k_filename = joinpath(data_directory, sigma_k_basename * ".jld2")
 const meff_filename = joinpath(res_directory, meff_basename * ".dat")
 const zfactor_filename = joinpath(res_directory, zfactor_basename * ".dat")
 const zinv_filename = joinpath(res_directory, inverse_zfactor_basename * ".dat")
+const chemical_potential_filename = joinpath(res_directory, chemical_potential_basename * ".dat")
 const dispersion_ratio_filename = joinpath(res_directory, dispersion_ratio_basename * ".dat")
 const inverse_dispersion_ratio_filename = joinpath(res_directory, inverse_dispersion_ratio_basename * ".dat")
