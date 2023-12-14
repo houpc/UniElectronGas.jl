@@ -27,6 +27,10 @@ function zfactor_inverse(data, β, nids=[1, 2], kidx=1) #assume the data are cal
     return @. (imag(data[nids[2], kidx]) - imag(data[nids[1], kidx])) / (2π / β)
 end
 
+function zfactor_inverse_single(data, β, nidx=1, kidx=1) #assume the data are calculated with ngrid = [0], kgrid = [para.kF]
+    return @. imag(data[nidx, kidx]) / (π / β)
+end
+
 function meff_inverse(data, para, kgrid, i_dk=1, nidx=1)
     kF_label = searchsortedfirst(kgrid, para.kF)
     return @. (data[nidx, kF_label+i_dk] - data[nidx, kF_label-i_dk]) / (kgrid[kF_label+i_dk] - kgrid[kF_label-i_dk]) * para.me / para.kF
@@ -37,20 +41,32 @@ function get_dzmu(para, datatuple; verbose=0,
     ngrid, kgrid, data = datatuple
     printstyled(UEG.short(para), color=:yellow)
     println()
+    @assert kgrid == [para.kF] "Function `get_dzmu` only supports kgrid = [para.kF]!"
+    @assert ngrid ∈ [[-1, 0], [0]] "Function `get_dzmu` only supports ngrid = [-1, 0] or [0]!"
+
+    # Assumes the data are calculated with ngrid = [0], kgrid = [para.kF] or with ngrid = [-1, 0], kgrid = [para.kF]
+    p1 = first(keys(data))
+    if size(data[p1], 1) == 1
+        get_zfactor = (data, β) -> zfactor_inverse_single(data, β)
+        get_mu = data -> mu(data, 1, 1)
+    else
+        get_zfactor = (data, β) -> zfactor_inverse(data, β)
+        get_mu = data -> mu(data)
+    end
 
     if verbose > 0
         for p in sort([k for k in keys(data)])
-            println("$p: μ = $(mu(data[p]))   z_inverse = $(zfactor_inverse(data[p], para.β))")
+            println("$p: μ = $(get_mu(data[p]))   z_inverse = $(get_zfactor(data[p], para.β))")
         end
     end
 
     _mu = Dict()
     for (p, val) in data
-        _mu[p] = mu(val)
+        _mu[p] = get_mu(val)
     end
     _zinv = Dict()
     for (p, val) in data
-        _zinv[p] = zfactor_inverse(val, para.β)
+        _zinv[p] = get_zfactor(val, para.β)
     end
 
     dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
@@ -92,7 +108,7 @@ function getSigma(para, filename=filename; parafile="para_wn_1minus0.csv", root_
     return ngrid, kgrid, rSw_k, iSw_k
 end
 
-function getZfactor(para; parafile="para_wn_1minus0.csv", root_dir=@__DIR__, isRenorm=true)
+function getZfactor(para; parafile="para_wn_1minus0.csv", root_dir=@__DIR__, isRenorm=false)
     _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
     dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
 
@@ -103,6 +119,98 @@ function getZfactor(para; parafile="para_wn_1minus0.csv", root_dir=@__DIR__, isR
         sumz = accumulate(+, dz)
         return @. 1.0 + sumz
     end
+end
+
+# 1/z = 1 - δs
+function getZinv(para; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+    dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
+    sumzinv = accumulate(+, dzinv)
+    return @. 1.0 + sumzinv
+end
+
+# ϵ_qp/ϵ_0 = 1 + δm
+function getDispersionRatio(para, filename, idx_dk::Int=1; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    order = para.order
+    ngrid, kgrid, rdata, idata = loaddata(para, filename)
+    _Meffinv = Dict()
+    for (p, val) in rdata
+        _Meffinv[p] = -meff_inverse(val, para, kgrid, idx_dk)  # δm
+    end
+
+    dMeffinv, dmu, _dMeff = CounterTerm.sigmaCT(order, _mu, _Meffinv)
+    println("dMeffinv: ", dMeffinv)
+    sumMeffinv = accumulate(+, dMeffinv)
+    return @. 1.0 + sumMeffinv
+end
+function getDispersionRatio(para, rSigma, kgrid::Vector{Float64}; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    order, kF = para.order, para.kF
+
+    # fit ReΣ(k,ω0) = a*(k-kF) + b*(k-kF)^2
+    dMeffinv = []
+    x = kgrid
+    @. model(x, p) = p[1] + p[2] * (x - kF) + p[3] * (x - kF)^2
+    println(rSigma)
+    fit_parameters = []
+    for o in 1:order
+        y = vec(Measurements.value.(rSigma[o]))
+        wt = vec(1 ./ Measurements.uncertainty.(rSigma[o]) .^ 2)
+        fit = curve_fit(model, x, y, wt, [1.0, -0.1, 0.0])
+        push!(dMeffinv, -Measurements.measurement(coef(fit)[2], stderror(fit)[2]) * para.me / kF)
+        push!(fit_parameters, [coef(fit), stderror(fit)])
+    end
+
+    println("dMeffinv: ", dMeffinv)
+    sumMeffinv = accumulate(+, dMeffinv)
+    return @. 1.0 + sumMeffinv, fit_parameters
+end
+
+# ϵ_0/ϵ_qp = 1 / (1 + δm)
+function getDispersionRatioInv(para, filename, idx_dk::Int=1; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    order = para.order
+    ngrid, kgrid, rdata, idata = loaddata(para, filename)
+    _Meffinv = Dict()
+    for (p, val) in rdata
+        _Meffinv[p] = -meff_inverse(val, para, kgrid, idx_dk)
+    end
+
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+
+    dMeffinv, dmu, _dMeff = CounterTerm.sigmaCT(order, _mu, _Meffinv)
+    println("dMeffinv: ", dMeffinv)
+
+    println("_dMeff: ", _dMeff)
+
+    Meff = Taylor1([1.0, _dMeff...], order)
+    dMeff = [getcoeff(Meff, o) for o in 1:order]
+
+    sumMeff = accumulate(+, dMeff)
+    return @. 1.0 + sumMeff
+end
+function getDispersionRatioInv(para, rSigma, kgrid::Vector{Float64}; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    order, kF = para.order, para.kF
+
+    # fit ReΣ(k,ω0) = a*(k-kF) + b*(k-kF)^2
+    dMeffinv = []
+    x = kgrid
+    @. model(x, p) = p[1] + p[2] * (x - kF) + p[3] * (x - kF)^2
+    println(rSigma)
+    fit_parameters = []
+    for o in 1:order
+        y = vec(Measurements.value.(rSigma[o]))
+        wt = vec(1 ./ Measurements.uncertainty.(rSigma[o]) .^ 2)
+        fit = curve_fit(model, x, y, wt, [1.0, -0.1, 0.0])
+        push!(dMeffinv, -Measurements.measurement(coef(fit)[2], stderror(fit)[2]) * para.me / kF)
+        push!(fit_parameters, [coef(fit), stderror(fit)])
+    end
+
+    _Meffinv = Taylor1([1.0, dMeffinv...], order)
+    println(_Meffinv)
+    Meff = 1.0 / _Meffinv
+    dMeff = [getcoeff(Meff, o) for o in 1:order]
+
+    sumMeff = accumulate(+, dMeff)
+    return @. 1.0 + sumMeff, fit_parameters
 end
 
 function getMeff(para, filename, idx_dk::Int=1; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)

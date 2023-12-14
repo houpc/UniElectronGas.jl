@@ -30,13 +30,7 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
         error("unknown mission")
     end
 
-    if isLayered2D
-        filename = "./data$(dim)d/data_$(mission)_layered2d.jld2"
-    else
-        filename = "./data$(dim)d/data_$(mission).jld2"
-    end
-    # filename = "data$(dim)_$(mission).jld2"
-
+    filename = mission == "Z" ? sigma_z_filename : sigma_k_filename
     sigma, result = Sigma.MC(para; kgrid=kgrid, ngrid=ngrid, spinPolarPara=spinPolarPara,
         neval=neval, filename=filename,
         isLayered2D=isLayered2D,

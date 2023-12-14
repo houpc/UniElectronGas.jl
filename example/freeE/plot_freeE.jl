@@ -12,7 +12,7 @@ Fs = [-0.0,]
 # beta = [25.0]
 beta = [80.0]
 order = [5,]
-const fileName = "freeE_$(dim)d.dat"
+const filename = "freeE_$(dim)d.dat"
 const val_benchmark =
     cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "orange" => "#EE7733", "red" => "#CC3311", "magenta" => "#EE3377", "grey" => "#BBBBBB"]);
 
@@ -53,7 +53,7 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
 
-    freeE_data = readdlm(fileName)
+    freeE_data = readdlm(filename)
     num_data = size(freeE_data)[1]
 
     freeE_total, error_total, mass2_total = [], [], []
