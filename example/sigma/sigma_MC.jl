@@ -2,14 +2,14 @@ using ElectronLiquid
 using CompositeGrids
 
 dim = 3
-rs = [1.0,]
+rs = [0.5,]
 # rs = [1.0, 2.0, 3.0]
 # rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
 # rs = [1.0, 2.0, 3.0, 4.0, 5.0]
 # Fs = -[0.223, 0.380, 0.516, 0.639, 0.752]
 # Fs = -[0.223,]
 # mass2 = [1.0, 2.0, 3.0]
-mass2 = [1e-4,]
+mass2 = [4.0,]
 # mass2 = [5.0,]
 # mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
 # mass2 = [4.0, 5.0, 6.0]
@@ -19,13 +19,13 @@ mass2 = [1e-4,]
 Fs = [-0.0,]
 beta = [100.0,]
 order = [3,]
-neval = 1e7
+neval = 1e6
 # neval = 1e8
-isDynamic = true
-# isDynamic = false
+# isDynamic = true
+isDynamic = false
 isFock = false
-# diagGenerate = :GV
-diagGenerate = :Parquet
+diagGenerate = :GV
+# diagGenerate = :Parquet
 
 # mission = :Z
 # mission = :K
