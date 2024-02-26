@@ -1,36 +1,10 @@
+using CompositeGrids
+using ElectronGas
+using ElectronLiquid
 using JLD2
 using PyCall
-using PyPlot
-using ElectronGas, ElectronLiquid, Parameters
-using Lehmann, GreenFunc, CompositeGrids
 
 @pyimport numpy as np   # for saving/loading numpy data
-
-# Vibrant qualitative colour scheme from https://personal.sron.nl/~pault/
-const cdict = Dict([
-    "orange" => "#EE7733",
-    "blue" => "#0077BB",
-    "cyan" => "#33BBEE",
-    "magenta" => "#EE3377",
-    "red" => "#CC3311",
-    "teal" => "#009988",
-    "grey" => "#BBBBBB",
-]);
-style = PyPlot.matplotlib."style"
-style.use(["science", "std-colors"])
-const color = [
-    "black",
-    cdict["orange"],
-    cdict["blue"],
-    cdict["cyan"],
-    cdict["magenta"],
-    cdict["red"],
-    cdict["teal"],
-]
-rcParams = PyPlot.PyDict(PyPlot.matplotlib."rcParams")
-rcParams["font.size"] = 16
-rcParams["mathtext.fontset"] = "cm"
-rcParams["font.family"] = "Times New Roman"
 
 @inline function get_Fs(rs)
     return get_Fs_PW(rs)
@@ -74,7 +48,7 @@ susceptibility ratio data (c.f. Kukkonen & Chen, 2021)
 end
 
 function GW0(G_prev, param, Euv, rtol, Nk, maxK, minK, order, int_type, kgrid::Union{AbstractGrid,AbstractVector,Nothing}=nothing; kwargs...)
-    @unpack dim = param
+    dim = param.dim
 
     if dim == 2
         if isnothing(kgrid)
@@ -122,15 +96,15 @@ function get_meff_from_Σ_GW(param::Parameter.Para; int_type=:rpa, δK=5e-6, max
 end
 
 # Helper function for linear interpolation with mixing parameter α
-function LERP(M_start, M_end)
+function LERP(M_start, M_end, alpha)
     return (1 - alpha) * M_start + alpha * M_end
 end
 
 function get_Σ_GW(param::Parameter.Para, int_type, max_steps, atol, alpha, δK, save_sigma)
     # Make sigma output directory if needed
     if save_sigma
-        mkpath("sigma_GW_$(param.dim)d")
-        dir = joinpath(@__DIR__, "sigma_GW_$(param.dim)d")
+        mkpath("results/sigma_GW_$(param.dim)d")
+        dir = joinpath(@__DIR__, "results/sigma_GW_$(param.dim)d")
     end
 
     # Make sure we are using parameters for the bare UEG theory
@@ -187,9 +161,9 @@ function get_Σ_GW(param::Parameter.Para, int_type, max_steps, atol, alpha, δK,
     zfactor_prev = SelfEnergy.zfactor(param, Σ; ngrid=[-1, 0])[1]
     @assert kamp ≈ param.kF
 
-    # Write initial (G0W0) self-energy to JLD2 file
+    # Write initial (G0W0) self-energy to JLD2 file, overwriting if it already exists
     if save_sigma
-        jldopen(joinpath(dir, "sigma_$(int_type)_rs$(rs).jl"), "a+") do file
+        jldopen(joinpath(dir, "sigma_$(int_type)_rs$(rs).jl"), "w") do file
             file["Σ_0"] = Σ
             file["Σ_ins_0"] = Σ_ins
         end
@@ -216,12 +190,12 @@ function get_Σ_GW(param::Parameter.Para, int_type, max_steps, atol, alpha, δK,
 
         # Get Σ[G_mix, W], where the input Green's function is a linear interpolation
         # of the previous and current G: G_mix = (1 - α) * G_prev + α * G
-        G_mix = LERP(G_prev, G)
+        G_mix = LERP(G_prev, G, alpha)
         Σ, Σ_ins = Σ_GW0(G_mix)
 
-        # Write self-energy at this step to JLD2 file
+        # Append self-energy at this step to JLD2 file
         if save_sigma
-            jldopen(joinpath(dir, "sigma_$(int_type).jl"), "a+") do file
+            jldopen(joinpath(dir, "sigma_$(int_type)_rs$(rs).jl"), "a+") do file
                 file["Σ_$(i_step + 1)"] = Σ
                 file["Σ_ins_$(i_step + 1)"] = Σ_ins
             end
@@ -316,23 +290,15 @@ function main()
     save_sigma = true
 
     # Output directory
-    mkpath("finalized_meff_results/$(dim)d")
-    dir = joinpath(@__DIR__, "finalized_meff_results/$(dim)d")
-
-    # rslist = [2.0]
-    # rslist = [1.0, 5.0, 10.0]
+    mkpath("results/finalized_meff_results/$(dim)d")
+    dir = joinpath(@__DIR__, "results/finalized_meff_results/$(dim)d")
 
     # rslist = [0.001; collect(LinRange(0.0, 1.1, 111))[2:end]]  # for accurate 2D HDL
     # rslist = [0.005; collect(LinRange(0.0, 5.0, 101))[2:end]]  # for 2D
     # rslist = [0.01; collect(LinRange(0.0, 10.0, 101))[2:end]]  # for 3D
 
     # rslist = [0.001; collect(range(0.0, 1.1, step=0.05))[2:end]]  # for accurate 2D HDL
-    # rslist = [0.01; collect(range(0.0, 10.0, step=0.5))[2:end]]  # for 3D
-
-    # rslist = [0.001; collect(range(0.0, 1.1, step=0.1))[2:end]]  # for accurate 2D HDL
-    # rslist = [0.01; collect(range(0.0, 10.0, step=1.0))[2:end]]  # for 3D
-
-    rslist = [10.0]
+    rslist = [0.01; collect(range(0.0, 10.0, step=0.5))[2:end]]  # for 3D
 
     # NOTE: int_type ∈ [:ko_const, :ko_takada_plus, :ko_takada, :ko_moroni, :ko_simion_giuliani] 
     # NOTE: KO interaction using G+ and/or G- is currently only available in 3D

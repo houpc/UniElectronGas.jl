@@ -73,7 +73,9 @@ end
 function main()
     # System parameters
     dim = 3
-    rs = 2.0
+    # rs = 0.01
+    # rs = 2.0
+    rs = 10.0
     δK = 5e-6
     beta = 1000.0
     param = Parameter.rydbergUnit(1.0 / beta, rs, dim)
@@ -92,7 +94,7 @@ function main()
     s = []
     si = []
     local n_max
-    jldopen("sigma_GW_$(dim)d/sigma_$(int_type).jl", "r") do f
+    jldopen("results/sigma_GW_$(dim)d/sigma_$(int_type)_rs$(rs).jl", "r") do f
         for i in 0:max_steps
             try
                 push!(s, f["Σ_$i"])
@@ -116,7 +118,8 @@ function main()
         push!(s_iw0s, s_iw[idx_iw0, :])
         push!(si_iw0s, si_iw[idx_iw0, :])
     end
-
+    println(length(s))
+    
     # DLR cutoffs
     kF = param.kF
     Euv, rtol = 1000 * param.EF, 1e-11
@@ -165,43 +168,50 @@ function main()
     end
 
     ax[1].annotate(
+        # "\$r_s = $(rs)\$",
         "\$r_s = $(Int(rs))\$",
-        xy=(0.775, 0.225),
+        # xy=(0.775, 0.225),
+        # xy=(0.8, 0.225),
+        xy=(0.786, 0.225),
         xycoords="axes fraction",
         ha="center",
         va="center",
     )
     ax[2].annotate(
         "\$\\left(\\frac{m^*}{m}\\right)_{G_0 $wstring} = $(round(meff_g0w; sigdigits=4))\$",
-        xy=(0.75, 0.75),
+        xy=(0.737, 0.7),
+        # xy=(0.75, 0.75),
         xycoords="axes fraction",
         ha="center",
         va="center",
     )
     ax[2].annotate(
         "\$\\left(\\frac{m^*}{m}\\right)_{G $wstring} = $(round(meff_gw; sigdigits=4))\$",
-        xy=(0.757, 0.6),
+        xy=(0.757, 0.55),
+        # xy=(0.757, 0.6),
         xycoords="axes fraction",
         ha="center",
         va="center",
     )
     ax[2].annotate(
         "\$Z_{G_0 $wstring} = $(round(zfactor_g0w; sigdigits=4))\$",
-        xy=(0.783, 0.45),
+        xy=(0.783, 0.4),
+        # xy=(0.783, 0.45),
         xycoords="axes fraction",
         ha="center",
         va="center",
     )
     ax[2].annotate(
         "\$Z_{G $wstring} = $(round(zfactor_gw; sigdigits=4))\$",
-        xy=(0.79, 0.3),
+        xy=(0.79, 0.25),
+        # xy=(0.79, 0.3),
         xycoords="axes fraction",
         ha="center",
         va="center",
     )
 
-    ax[1].set_ylim(-0.35, 0.25)
-    ax[1].set_yticks(-0.3:0.1:0.2)
+    # ax[1].set_ylim(-0.35, 0.25)
+    # ax[1].set_yticks(-0.3:0.1:0.2)
     ax[1].set_xlim(0, 5)
     ax[2].set_xlim(0, 5)
     ax[1].legend(loc="best")
@@ -210,7 +220,7 @@ function main()
     ax[2].set_ylabel("\$\\text{Im}\\Sigma_c(k, i\\omega_0)\$")
     ax[2].set_xlabel("\$k / k_F\$")
     plt.tight_layout()
-    fig.savefig("static_gw_self_energy_$(int_type).pdf")
+    fig.savefig("figures/static_gw_self_energy_$(int_type)_rs$(rs).pdf")
 end
 
 main()
