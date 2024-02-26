@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import scienceplots
 import numpy as np
+import pandas as pd
 from scipy import interpolate
 import matplotlib as mat
 import matplotlib.pyplot as plt
@@ -36,12 +37,14 @@ Colormap = [
     cdict["cyan"],
     "black",
     cdict["teal"],
+    "grey",
 ]
 # pt_beta = {0.125: 'o', 0.25: '^', 0.5: 'h', 1.0: 'v', 2.0: 'd', 2.5:'p', 16.0: 's'}
 pts = ['s', '^', 'v', 'p', 's', 'o', 'd']
 # fig, axes = plt.subplots(1,2, sharex='col')#, sharey=True, gridspec_kw={'wspace': 0})
 # fig, ax1 = plt.subplots(figsize=(6, 4.6))
-fig, ax1 = plt.subplots(figsize=(6, 4))
+# fig, ax1 = plt.subplots(figsize=(6, 4))
+fig, ax1 = plt.subplots(figsize=(5, 5))
 # fig.set_size_inches(13,10)
 
 # m_VDMC = [1.0, 0.95861, 0.9511, 0.9516, 0.9601, 0.968, 0.9782]
@@ -71,29 +74,62 @@ m_G0W0 = [1.0, 0.970, 0.992, 1.016, 1.039, 1.059, 1.078]
 m_Gp = [1.0, 0.952, 0.951, 0.956, 0.962, 0.968, 0.973]
 m_Gpm = [1.0, 0.957, 0.966, 0.983, 1.005, 1.028, 1.055]
 
-def errorbar_mvsrs(rs, mdata, merr, idx, label, ax=ax1, zorder=None):
+def errorbar_mvsrs(rs, meff_data, merr, idx, label, ax=ax1, zorder=None):
     if zorder is not None:
-        handle = ax.errorbar(rs, mdata, merr, fmt=pts[idx], capthick=1, capsize=4,
+        handle = ax.errorbar(rs, meff_data, merr, fmt=pts[idx], capthick=1, capsize=4,
                 ms=5, color=Colormap[idx], label=label, zorder=zorder)
     else:
-        handle = ax.errorbar(rs, mdata, merr, fmt=pts[idx], capthick=1, capsize=4,
+        handle = ax.errorbar(rs, meff_data, merr, fmt=pts[idx], capthick=1, capsize=4,
                     ms=5, color=Colormap[idx], label=label)
     return handle
 
-def plot_mvsrs(rs, mdata, idx, label, ls='-', ax=ax1):
-    # mfitfunc = interpolate.PchipInterpolator(rs, mdata)
-    mfitfunc = interpolate.Akima1DInterpolator(rs, mdata)
+def plot_mvsrs(rs, meff_data, idx, label, ls='-', ax=ax1, rs_LDL=None, meff_LDL=None, zorder=None):
+    # Add data in the low-density limit to the fit, if provided
+    if (rs_LDL is not None) and (meff_LDL is not None):
+        rslist = pd.unique(np.concatenate([rs, rs_LDL]))
+        mdatalist = pd.unique(np.concatenate([meff_data, meff_LDL]))
+        P = np.argsort(rslist)
+        rs = rslist[P]
+        meff_data = mdatalist[P]
+    print(rs)
+    print(meff_data)
+
+    # mfitfunc = interpolate.PchipInterpolator(rs, meff_data)
+    mfitfunc = interpolate.Akima1DInterpolator(rs, meff_data)
     # xgrid = np.arange(0, 6.2, 0.02)
     xgrid = np.arange(0, 6.2, 0.02)
-    # ax.plot(rs, mdata, 'o', ms=10, color=Colormap[idx])
+    # ax.plot(rs, meff_data, 'o', ms=10, color=Colormap[idx])
     # ax.plot(xgrid, mfitfunc(xgrid), ls=ls, lw=2, color=Colormap[idx], label=label)
-    handle, = ax.plot(xgrid, mfitfunc(xgrid), ls=ls, color=Colormap[idx], label=label)
+    if zorder is not None:
+        handle, = ax.plot(xgrid, mfitfunc(xgrid), ls=ls, color=Colormap[idx], label=label, zorder=zorder)
+    else:
+        handle, = ax.plot(xgrid, mfitfunc(xgrid), ls=ls, color=Colormap[idx], label=label)
 
     yfit = np.ma.masked_invalid(mfitfunc(xgrid))
     # print(yfit)
     print("Turning point: rs = ", xgrid[np.argmin(yfit)])
     print("Effective mass ratio at turning point: ", np.min(yfit))
     return handle
+
+# Taylor series for m* / m in the low-density limit to leading order in rs
+# (c.f. Giuliani & Vignale, Quantum Theory of the Electron Liquid, 2008, p. 500)
+def low_density_limit(x):
+    alpha = (4.0 / (9.0 * np.pi))**(1.0 / 3.0)
+    return 1 + alpha * x * np.log(x) / (2.0 * np.pi)
+
+# Low-density limit
+rs_LDL_plot = np.linspace(1e-5, 0.35, num=101)
+meff_LDL_plot = np.array([low_density_limit(rs) for rs in rs_LDL_plot])
+
+# Use exact expression in the low-density limit for RPA(+FL) and RPT fits
+cutoff_LDL = 0.1
+rs_LDL = rs_LDL_plot[rs_LDL_plot <= cutoff_LDL]
+meff_LDL = meff_LDL_plot[rs_LDL_plot <= cutoff_LDL]
+print(rs_LDL)
+print(meff_LDL)
+
+# Low-density limit
+# plot_mvsrs(rs_LDL_plot, meff_LDL_plot, 7, "LDL", "--", zorder=1000)
 
 # m_QMC = [m_DMC, m_SJVMC]
 # m_QMC_errs = [m_DMC_err, m_SJVMC_err]
@@ -113,20 +149,25 @@ labels = [r"$G_0W_0$", r"$G_+$", r"$G_+$\,\&\,$G_-$"]
 idx = 2
 for (mdat, label) in zip(m_RPA, labels):
     print("\nPlotting ", label)
-    handle = plot_mvsrs(rs_RPA, mdat, idx, label, '--')
+    handle = plot_mvsrs(rs_RPA, mdat, idx, label, '--', rs_LDL=rs_LDL, meff_LDL=meff_LDL)
     l1_handles.append(handle)
     idx = idx + 1
 
-handle3 = errorbar_mvsrs(rs_VDMC, m_VDMC, m_VDMC_err, idx, "Our data", zorder=30)
+# Add points at rs = 0
+# rs_LDL = np.insert(rs_LDL, 0, 0.0)
+# meff_LDL = np.insert(meff_LDL, 0, 1.0)
+
+handle3 = errorbar_mvsrs(rs_VDMC, m_VDMC, m_VDMC_err, idx, "This work", zorder=30)
 # rs_VDMC.append(5.2)
 # m_VDMC.append(0.98)
 print("\nPlotting our data")
-plot_mvsrs(rs_VDMC, m_VDMC, idx, "", '-')
+plot_mvsrs(rs_VDMC, m_VDMC, idx, "", '-', rs_LDL=rs_LDL, meff_LDL=meff_LDL)
 
 ax1.set_xlabel(r"$r_s$")
 ax1.set_ylabel(r"$m^*/m$")
 ax1.set_xlim(0, 6.2)
-ax1.set_ylim(0.745, 1.095)
+ax1.set_ylim(0.765, 1.095)
+# ax1.set_ylim(0.745, 1.095)
 # ax1.set_ylim(0.78, 1.065)
 # ax1.set_ylim(0.94, 0.99)
 # ax1.legend(loc="upper left", fontsize=14, ncol=2)

@@ -231,14 +231,14 @@ function getMeff(para, filename, idx_dk::Int=1; parafile="para_wn_1minus0.csv", 
 
     println("_dMeff: ", _dMeff)
     zinv = Taylor1([1.0, dzinv...], order)
+    inverse_dispersion_ratio = Taylor1([1.0, _dMeff...], order)
 
-    Meff = zinv * Taylor1([1.0, _dMeff...], order)
+    Meff = zinv * inverse_dispersion_ratio
     dMeff = [getcoeff(Meff, o) for o in 1:order]
 
     sumMeff = accumulate(+, dMeff)
     return @. 1.0 + sumMeff
 end
-
 function getMeff(para, rSigma, kgrid::Vector{Float64}; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
     order, kF = para.order, para.kF
 
@@ -263,12 +263,74 @@ function getMeff(para, rSigma, kgrid::Vector{Float64}; parafile="para_wn_1minus0
     zinv = Taylor1([1.0, dzinv...], order)
     println(zinv)
 
-    _Meffinv = Taylor1([1.0, dMeffinv...], order)
-    println(_Meffinv)
-    Meff = zinv / _Meffinv
+    dispersion_ratio = Taylor1([1.0, dMeffinv...], order)
+    println(dispersion_ratio)
+    Meff = zinv / dispersion_ratio
     dMeff = [getcoeff(Meff, o) for o in 1:order]
 
     sumMeff = accumulate(+, dMeff)
     return @. 1.0 + sumMeff, fit_parameters
     # return @. 1.0 + sumMeff
+end
+
+function getMeffInv(para, filename, idx_dk::Int=1; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    order = para.order
+    ngrid, kgrid, rdata, idata = loaddata(para, filename)
+    _Meffinv = Dict()
+    for (p, val) in rdata
+        _Meffinv[p] = -meff_inverse(val, para, kgrid, idx_dk)
+    end
+
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+
+    dzinv, dmu, dz = CounterTerm.sigmaCT(order, _mu, _zinv)
+    println("dmu: ", dmu)
+
+    _dMeffinv, dmu, _dMeff = CounterTerm.sigmaCT(order, _mu, _Meffinv)
+    println("dMeffinv: ", _dMeffinv)
+
+    println("_dMeff: ", _dMeff)
+    zfactor = Taylor1([1.0, dz...], order)
+    dispersion_ratio = Taylor1([1.0, _dMeffinv...], order)
+
+    MeffInv = zfactor * dispersion_ratio
+    dMeffInv = [getcoeff(MeffInv, o) for o in 1:order]
+
+    sumMeffInv = accumulate(+, dMeffInv)
+    return @. 1.0 + sumMeffInv
+end
+function getMeffInv(para, rSigma, kgrid::Vector{Float64}; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    order, kF = para.order, para.kF
+
+    # fit ReΣ(k,ω0) = a*(k-kF) + b*(k-kF)^2
+    dMeffinv = []
+    x = kgrid
+    @. model(x, p) = p[1] + p[2] * (x - kF) + p[3] * (x - kF)^2
+    println(rSigma)
+    fit_parameters = []
+    for o in 1:order
+        y = vec(Measurements.value.(rSigma[o]))
+        wt = vec(1 ./ Measurements.uncertainty.(rSigma[o]) .^ 2)
+        fit = curve_fit(model, x, y, wt, [1.0, -0.1, 0.0])
+        push!(dMeffinv, -Measurements.measurement(coef(fit)[2], stderror(fit)[2]) * para.me / kF)
+        push!(fit_parameters, [coef(fit), stderror(fit)])
+    end
+
+    # para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=para.order, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
+    # _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+    dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)    
+    zfactor = Taylor1([1.0, dz...], order)
+    zinv = Taylor1([1.0, dz...], order)
+    println("z: ", zfactor)
+    println("1/zinv: ", 1.0 / zinv)
+
+    dispersion_ratio = Taylor1([1.0, dMeffinv...], order)
+    println(dispersion_ratio)
+
+    MeffInv = zfactor * dispersion_ratio
+    dMeffInv = [getcoeff(MeffInv, o) for o in 1:order]
+
+    sumMeffInv = accumulate(+, dMeffInv)
+    return @. 1.0 + sumMeffInv, fit_parameters
 end

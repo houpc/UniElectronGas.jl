@@ -7,6 +7,7 @@ using Measurements
 
 @pyimport scienceplots  # `import scienceplots` is required as of version 2.0.0
 @pyimport scipy.interpolate as interp
+@pyimport matplotlib.gridspec as gridspec
 
 include("../input.jl")
 
@@ -193,39 +194,60 @@ end
 
 function plot_all_order_convergence(; beta=beta[1])
     plot_rs = [1.0, 5.0]
+    num_rs = length(plot_rs)
+    @assert num_rs == 2 "plot_rs must be a 2-element array"
     plot_lambda = [fixed_lambda_optima_3d[rs] for rs in plot_rs]
 
-    num_rs = length(plot_rs)
-    figure(figsize=(4 * num_rs, 4))
-    label_locs = [(1.0, 0.875), (3.8, 1.055), (2.6, 0.925)]
+    # figure(figsize=(4, 4 * num_rs))
+    figure(figsize=(4, 4 * num_rs))
+    label_locs = [(4.4, 1.1125), (1.4, 0.935), (1.975, 1.02)]
+    # label_locs = [(2.2, 1.0825), (1.5, 0.9425), (1.85, 1.0275)]
     labels = [
-        "\$(1 + \\delta m)^{-1}\$",
-        "\$(1 - \\delta s)\$",
-        "\$m^\\star / m\$",
-        # "\$(1 + \\delta m)\$",
+        # "\$1 + \\partial_{\\xi_k} \\text{Re}\\Sigma(k, 0) \\big|_{k = k_F}\$",
+        "\$D\$",
+        "\$Z\$",
+        "\$m / m^* = Z \\cdot D\$",
     ]
-    for (i, (rs, lambda)) in enumerate(zip(plot_rs, plot_lambda))
-        ax = subplot(1, num_rs, i)
+    # label_locs = [(1.0, 0.875), (3.8, 1.055), (2.6, 0.925)]
+    # labels = [
+    #     "\$(1 + \\delta m)^{-1}\$",
+    #     "\$(1 - \\delta s)\$",
+    #     "\$m^* / m\$",
+    #     # "\$(1 + \\delta m)\$",
+    # ]
+
+    # Helper function to plot a single subplot
+    function plot_at_rs(i, rs, lambda; ax0=nothing)
+        if isnothing(ax0)
+            ax = plt.subplot(num_rs, 1, i)
+        else
+            ax = plt.subplot(num_rs, 1, i, sharex=ax0)
+        end
         filenames = [
-            inverse_dispersion_ratio_filename,
-            zinv_filename,
-            meff_filename,
-            # dispersion_ratio_filename,
+            dispersion_ratio_filename,
+            zfactor_filename,
+            inverse_meff_filename,
+            # inverse_dispersion_ratio_filename,
+            # zinv_filename,
+            # meff_filename,
         ]
-        ics = [2, 3, 1]
-        # ics = [1]
-        for (j, (filename, ic)) in enumerate(zip(filenames, ics))
+        colors = [
+            cdict["red"],
+            cdict["blue"],
+            "black",
+        ]
+        for (j, (filename, color)) in enumerate(zip(filenames, colors))
             means, errors, lambda = load_from_dlm(filename, lambda; rs=rs)
             valid_means = collect(skipmissing(means))
             valid_errors = collect(skipmissing(errors))
             x = collect(eachindex(valid_means))
             yval = valid_means
             yerr = valid_errors
-            errorbar(
+            ax.errorbar(
                 x,
                 yval,
                 yerr=yerr,
-                color=color[ic],
+                color=color,
                 capsize=4,
                 fmt="o--",
                 zorder=10 * j,
@@ -240,21 +262,39 @@ function plot_all_order_convergence(; beta=beta[1])
                 d2 = abs(yval[end] - yval[end-2])
                 error_estimate = yerr[end] + max(d1, d2)
                 meff_estimate = measurement(yval[end], error_estimate)
-                axhspan(
+                ax.axhspan(
                     yval[end] - error_estimate,
                     yval[end] + error_estimate;
                     color=cdict["grey"],
                 )
-                axhline(yval[end]; linestyle="--", color="dimgrey")
-                println("rs = $rs, λ = $lambda:\tm*/m ≈ $meff_estimate")
+                ax.axhline(yval[end]; linestyle="--", color="dimgrey")
+                println("rs = $rs, λ = $lambda:\tm/m* ≈ $meff_estimate")
             end
         end
-        xticks(collect(1:order[1]))
-        xlabel("Perturbation order \$N\$")
-        legend(; title="\$r_s = $(Int(rs))\$", loc="upper left")
+        # ax.set_ylim(0.85, 1.1)
+        ax.set_xticks(collect(1:order[1]))
+        ax.legend(; title="\$r_s = $(Int(rs))\$", loc="upper left")
+        return ax
     end
-    tight_layout()
-    savefig("meff$(dim)d_rs$(plot_rs)_beta$(beta)$(modestr)_with_cancellations_vs_N.pdf")
+
+    # first subplot
+    ax0 = plot_at_rs(1, plot_rs[1], plot_lambda[1])
+    # ax0.set_ylim(0.85, 1.1)
+    plt.setp(ax0.get_xticklabels(), visible=false)  # use shared x-axis
+
+    # second subplot
+    ax1 = plot_at_rs(2, plot_rs[2], plot_lambda[2]; ax0=ax0)
+    ax1.set_xlabel("Perturbation order \$N\$")
+
+    # remove last tick label for the second subplot
+    yticks = ax1.yaxis.get_major_ticks()
+    yticks[end].label1.set_visible(false)
+
+    # remove vertical gap between subplots
+    plt.subplots_adjust(hspace=0.0)
+
+    plt.savefig("meff$(dim)d_cancellations_vs_N.pdf")
+    # plt.savefig("meff$(dim)d_rs$(plot_rs)_beta$(beta)$(modestr)_with_cancellations_vs_N.pdf")
 end
 
 function plot_meff_order_convergence(;
@@ -273,7 +313,7 @@ function plot_meff_order_convergence(;
             x = collect(eachindex(valid_means))
             yval = valid_means
             yerr = valid_errors
-            starstr = j == 1 ? "^\\star" : ""
+            starstr = j == 1 ? "^*" : ""
             errorbar(
                 x,
                 yval,
@@ -303,7 +343,7 @@ function plot_meff_order_convergence(;
         xticks(collect(1:order[1]))
         xlabel("Perturbation order \$N\$")
         if i == 1
-            ylabel("\$m^\\star / m\$")
+            ylabel("\$m^* / m\$")
         end
         legend(; title="\$r_s = $(rs)\$", loc="best")
     end
@@ -460,12 +500,12 @@ function plot_meff_lambda_convergence(maxOrder=order[1]; rs=rs[1], beta=beta[1])
     )
     legend(; loc="lower right", ncol=ncol, columnspacing=columnspacing)
     xlabel("\$\\lambda\$ (Ry)")
-    ylabel("\$m^\\star / m\$")
+    ylabel("\$m^* / m\$")
     savefig("meff$(dim)d_rs$(rs)_beta$(beta)$(modestr)_vs_lambda.pdf")
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     plot_all_order_convergence()
-    plot_meff_lambda_convergence()
-    plot_meff_order_convergence(plot_rs=[0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    # plot_meff_lambda_convergence()
+    # plot_meff_order_convergence(plot_rs=[0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
 end

@@ -51,3 +51,7 @@ Manifest.toml
 .history
 LocalPreferences.toml
 run/
+results/
+archives/
+benchmark/
+test_runs/

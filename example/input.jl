@@ -1,44 +1,18 @@
-dim = 3 # dimension of the problem
+# Use finalized lambda scans to determine mass2 for maximum orders N = 4, 5, 6
+include("lambda_scans.jl")
+dim = 3      # dimension of the problem
+rs = [6.0]
+order = [5]  # maximum diagram order of the run
+mass2 = rs_to_lambdas[dim][order[1]][rs[1]]
 
-### rs = 0.5 ###
-# rs = [0.5]
-# mass2 = [3.5]  # screening parameter
+Fs = [-0.0]        # Fermi liquid parameter with zero angular momentum
+beta = [40.0]      # inverse temperature beta = β*E_F 
+neval = 1e11       # number of Monte Carlo samples
+isDynamic = false  # whether to use effective field theory with dynamic screening or not 
+isFock = false     # whether to use Fock renormalization or not
 
-### rs = 1 ###
-# rs = [1.0]
-# mass2 = [1.75]  # screening parameter
-
-### rs = 2 ###
-rs = [2.0]
-# mass2 = [2.25]  # screening parameter
-mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.625, 1.75, 1.875, 2.0, 2.125, 2.25, 2.5, 3.0]
-
-### rs = 3 ###
-# rs = [3.0]
-# mass2 = [1.5]  # screening parameter
-
-### rs = 4 ###
-# rs = [4.0]
-# mass2 = [1.125]  # screening parameter
-
-### rs = 5 ###
-# rs = [5.0]
-# mass2 = [1.125]  # screening parameter
-
-### rs = 6 ###
-# rs = [6.0]
-# mass2 = [1.0, 1.125, 1.25]
-# mass2 = [0.375, 0.5, 0.625, 0.75, 0.875, 1.0, 1.125, 1.25, 1.5, 1.75, 2.0]  # screening parameter
-
-Fs = [-0.0]    # Fermi liquid parameter with zero angular momentum
-beta = [40.0]   # inverse temperature beta = β*E_F 
-order = [5]    # order of diagrams
-neval = 1e11    # number of Monte Carlo samples
-isDynamic = false # whether to use effective field theory with dynamic screening or not 
-isFock = false # whether to use Fock renormalization or not
-
-diagGenerate = :GV # :GV or :Parquet, algorithm to generate diagrams
-isLayered2D = false # whether to use layered 2D system or not
+diagGenerate = :GV   # :GV or :Parquet, algorithm to generate diagrams
+isLayered2D = false  # whether to use layered 2D system or not
 
 spin = 2    # 2 for unpolarized, 1 for polarized
 spinPolarPara = 2 / spin - 1 # spin-polarization parameter (n_up - n_down) / (n_up + n_down) ∈ [0,1]
@@ -52,6 +26,7 @@ basenames = [
     "data$(dim)d_Z",
     "data$(dim)d_K",
     "meff_$(dim)d",
+    "inverse_meff_$(dim)d",
     "zfactor_$(dim)d",
     "inverse_zfactor_$(dim)d",
     "chemical_potential_$(dim)d",
@@ -74,6 +49,7 @@ para_basename,
 sigma_z_basename,
 sigma_k_basename,
 meff_basename,
+inverse_meff_basename,
 zfactor_basename,
 inverse_zfactor_basename,
 chemical_potential_basename,
@@ -90,6 +66,7 @@ const parafilename = joinpath(para_directory, para_basename * ".csv")
 const sigma_z_filename = joinpath(data_directory, sigma_z_basename * ".jld2")
 const sigma_k_filename = joinpath(data_directory, sigma_k_basename * ".jld2")
 const meff_filename = joinpath(res_directory, meff_basename * ".dat")
+const inverse_meff_filename = joinpath(res_directory, inverse_meff_basename * ".dat")
 const zfactor_filename = joinpath(res_directory, zfactor_basename * ".dat")
 const zinv_filename = joinpath(res_directory, inverse_zfactor_basename * ".dat")
 const chemical_potential_filename = joinpath(res_directory, chemical_potential_basename * ".dat")
