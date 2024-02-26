@@ -293,20 +293,12 @@ function main()
     mkpath("results/finalized_meff_results/$(dim)d")
     dir = joinpath(@__DIR__, "results/finalized_meff_results/$(dim)d")
 
-    # rslist = [2.0]
-    # rslist = [1.0, 5.0, 10.0]
-
     # rslist = [0.001; collect(LinRange(0.0, 1.1, 111))[2:end]]  # for accurate 2D HDL
     # rslist = [0.005; collect(LinRange(0.0, 5.0, 101))[2:end]]  # for 2D
     # rslist = [0.01; collect(LinRange(0.0, 10.0, 101))[2:end]]  # for 3D
 
     # rslist = [0.001; collect(range(0.0, 1.1, step=0.05))[2:end]]  # for accurate 2D HDL
-    # rslist = [0.01; collect(range(0.0, 10.0, step=0.5))[2:end]]  # for 3D
-
-    # rslist = [0.001; collect(range(0.0, 1.1, step=0.1))[2:end]]  # for accurate 2D HDL
-    # rslist = [0.01; collect(range(0.0, 10.0, step=1.0))[2:end]]  # for 3D
-
-    rslist = [10.0]
+    rslist = [0.01; collect(range(0.0, 10.0, step=0.5))[2:end]]  # for 3D
 
     # NOTE: int_type ∈ [:ko_const, :ko_takada_plus, :ko_takada, :ko_moroni, :ko_simion_giuliani] 
     # NOTE: KO interaction using G+ and/or G- is currently only available in 3D
