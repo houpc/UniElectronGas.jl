@@ -302,10 +302,10 @@ function main()
 
     # NOTE: int_type ∈ [:ko_const, :ko_takada_plus, :ko_takada, :ko_moroni, :ko_simion_giuliani] 
     # NOTE: KO interaction using G+ and/or G- is currently only available in 3D
-    int_type_Gp = :ko_const_p
-    int_type_Gpm = :ko_const_pm
-    # int_type_Gp = :ko_moroni
-    # int_type_Gpm = :ko_simion_giuliani
+    # int_type_Gp = :ko_const_p
+    # int_type_Gpm = :ko_const_pm
+    int_type_Gp = :ko_moroni
+    int_type_Gpm = :ko_simion_giuliani
     @assert int_type_Gp ∈ [:ko_const_p, :ko_takada_plus, :ko_moroni]
     @assert int_type_Gpm ∈ [:ko_const_pm, :ko_takada, :ko_simion_giuliani]
 
@@ -358,44 +358,47 @@ function main()
 
     # GW effective masses
     if calc_gw
-        m_Σ_GW0 = []
-        # if dim == 3
-        #     m_Σ_GWp = []
-        #     m_Σ_GWpm = []
-        # end
+        # m_Σ_GW0 = []
+        if dim == 3
+            m_Σ_GWp = []
+            m_Σ_GWpm = []
+        end
         _rslist = calc_g0w ? rslist[2:end] : rslist
         for rs in _rslist
             param = Parameter.rydbergUnit(1.0 / beta, rs, dim)
 
             print("Calculating m*/m[GW] values for rs = $rs...")
-            m_Σ_GW0_this_rs = get_meff_from_Σ_GW(param; int_type=:rpa, δK=δK,
-                max_steps=max_steps, atol=atol, alpha=alpha, save_sigma=save_sigma)
-            # if dim == 3
-            #     m_Σ_GWp_this_rs = get_meff_from_Σ_GW(param; int_type=int_type_Gp, δK=δK,
-            #         max_steps=max_steps, atol=atol, alpha=alpha)
-            #     m_Σ_GWpm_this_rs = get_meff_from_Σ_GW(param; int_type=int_type_Gpm, δK=δK,
-            #         max_steps=max_steps, atol=atol, alpha=alpha)
-            # end
+            # m_Σ_GW0_this_rs = get_meff_from_Σ_GW(param; int_type=:rpa, δK=δK,
+            #     max_steps=max_steps, atol=atol, alpha=alpha, save_sigma=save_sigma)
+            if dim == 3
+                m_Σ_GWp_this_rs = get_meff_from_Σ_GW(param; int_type=int_type_Gp, δK=δK,
+                    max_steps=max_steps, atol=atol, alpha=alpha)
+                m_Σ_GWpm_this_rs = get_meff_from_Σ_GW(param; int_type=int_type_Gpm, δK=δK,
+                    max_steps=max_steps, atol=atol, alpha=alpha)
+            end
             println("done.")
 
-            push!(m_Σ_GW0, m_Σ_GW0_this_rs)
-            # if dim == 3
-            #     push!(m_Σ_GWp, m_Σ_GWp_this_rs)
-            #     push!(m_Σ_GWpm, m_Σ_GWpm_this_rs)
-            # end
+            # push!(m_Σ_GW0, m_Σ_GW0_this_rs)
+            if dim == 3
+                push!(m_Σ_GWp, m_Σ_GWp_this_rs)
+                push!(m_Σ_GWpm, m_Σ_GWpm_this_rs)
+            end
         end
         # Add points at rs = 0
-        pushfirst!(m_Σ_GW0, 1.0)
-        # if dim == 3
-        #     pushfirst!(m_Σ_GWp, 1.0)
-        #     pushfirst!(m_Σ_GWpm, 1.0)
-        # end
+        if calc_g0w == false
+            pushfirst!(rslist, 0.0)
+        end
+        # pushfirst!(m_Σ_GW0, 1.0)
+        if dim == 3
+            pushfirst!(m_Σ_GWp, 1.0)
+            pushfirst!(m_Σ_GWpm, 1.0)
+        end
         # Save data
-        np.savez(joinpath(dir, "rpa/meff_$(dim)d_sigma_GW0.npz"), rslist=rslist, mefflist=m_Σ_GW0)
-        # if dim == 3
-        #     np.savez(joinpath(dir, "$(ko_dirstr)/meff_$(dim)d_sigma_GWp.npz"), rslist=rslist, mefflist=m_Σ_GWp)
-        #     np.savez(joinpath(dir, "$(ko_dirstr)/meff_$(dim)d_sigma_GWpm.npz"), rslist=rslist, mefflist=m_Σ_GWpm)
-        # end
+        # np.savez(joinpath(dir, "rpa/meff_$(dim)d_sigma_GW0.npz"), rslist=rslist, mefflist=m_Σ_GW0)
+        if dim == 3
+            np.savez(joinpath(dir, "$(ko_dirstr)/meff_$(dim)d_sigma_GWp.npz"), rslist=rslist, mefflist=m_Σ_GWp)
+            np.savez(joinpath(dir, "$(ko_dirstr)/meff_$(dim)d_sigma_GWpm.npz"), rslist=rslist, mefflist=m_Σ_GWpm)
+        end
     end
 end
 
