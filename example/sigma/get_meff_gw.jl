@@ -109,7 +109,6 @@ function get_Σ_GW(param::Parameter.Para, int_type, max_steps, atol, alpha, δK,
 
     # Make sure we are using parameters for the bare UEG theory
     @assert param.Λs == param.Λa == 0.0
-    @assert int_type == :rpa
 
     # Get Fermi liquid parameter F⁰ₛ(rs) from Perdew-Wang fit
     rs = round(param.rs; sigdigits=13)
