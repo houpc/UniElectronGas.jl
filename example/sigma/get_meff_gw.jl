@@ -144,7 +144,7 @@ function get_Σ_GW(param::Parameter.Para, int_type, max_steps, atol, alpha, δK,
             minK=minK,
             order=order,
             int_type=_int_type,
-            Fs=int_type == :ko_const_p ? -Fs : -0.0,   # NOTE: NEFT uses opposite sign convention for F!
+            Fs=_int_type == :ko_const ? -Fs : -0.0,   # NOTE: NEFT uses opposite sign convention for F!
             Fa=int_type == :ko_const_pm ? -Fa : -0.0,  # NOTE: NEFT uses opposite sign convention for F!
         )
     end
@@ -265,7 +265,7 @@ function get_meff_from_Σ_G0W(param::Parameter.Para; δK=5e-6, int_type=:rpa)
         minK=minK,
         order=order,
         int_type=_int_type,
-        Fs=int_type == :ko_const_p ? -Fs : -0.0,   # NOTE: NEFT uses opposite sign convention for F!
+        Fs=_int_type == :ko_const ? -Fs : -0.0,   # NOTE: NEFT uses opposite sign convention for F!
         Fa=int_type == :ko_const_pm ? -Fa : -0.0,  # NOTE: NEFT uses opposite sign convention for F!
     )
 
