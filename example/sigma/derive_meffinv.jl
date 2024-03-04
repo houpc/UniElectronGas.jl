@@ -21,16 +21,16 @@ if abspath(PROGRAM_FILE) == @__FILE__
                 println(UEG.paraid(para))
 
                 ngrid, kgrid, rSw_k, iSw_k = UniElectronGas.getSigma(para, sigma_k_filename; parafile=parafilename)
-                meff, fit_p = UniElectronGas.getMeff(para, rSw_k, kgrid; parafile=parafilename)
+                meff, fit_p = UniElectronGas.getMeffInv(para, rSw_k, kgrid; parafile=parafilename)
                 # meff = UniElectronGas.getMeff(para, rSw_k, kgrid)
-                println("m* / m = ", meff)
+                println("m / m* = ", meff)
                 push!(results, Any[_rs, _beta, _mass2, _order, meff...])
                 writedlm("fit.dat", fit_p)
             end
         end
     end
     if isSave
-        open(meff_filename, "a+") do io
+        open(inverse_meff_filename, "a+") do io
             writedlm(io, results)
         end
     end

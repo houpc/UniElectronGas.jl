@@ -12,7 +12,7 @@ mass2 = [1.0, 1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7
 Fs = [-0.0,]
 beta = [25.0]
 order = [3,]
-const fileName = symmetry ? "Fsl_$(dim)d.dat" : "Fal_$(dim)d.dat"
+const filename = symmetry ? "Fsl_$(dim)d.dat" : "Fal_$(dim)d.dat"
 
 cdict = Dict(["blue" => "#0077BB", "cyan" => "#33BBEE", "teal" => "#009988", "orange" => "#EE7733", "red" => "#CC3311", "magenta" => "#EE3377", "grey" => "#BBBBBB"]);
 
@@ -74,7 +74,7 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
 
-    ver4_data = readdlm(fileName)
+    ver4_data = readdlm(filename)
     num_data = size(ver4_data)[1]
 
     for _l in ells

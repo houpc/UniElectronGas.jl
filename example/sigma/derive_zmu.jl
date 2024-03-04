@@ -3,17 +3,7 @@ using JLD2, DelimitedFiles
 
 include("../input.jl")
 
-if isLayered2D
-    const filename = "./data$(dim)d/data_Z_layered2d.jld2"
-else
-    const filename = "./data$(dim)d/data_Z.jld2"
-end
-# const filename = "./data2d_Z_v0.jld2"
-# const filename = "./data$(dim)d/data$(dim)d_Z_beta80_rs$(rs[1]).jld2"
-const savefilename = spin == 2 ? "zfactor_$(dim)d.dat" : "zfactor_$(dim)d_spin$spin.dat"
-
-
-function zfactor_renorm(dz, dzinv; isRenorm=true)
+function zfactor_renorm(dz, dzinv; isRenorm=false)
     if isRenorm
         sumzinv = accumulate(+, dzinv)
         return @. 1.0 / (1.0 + sumzinv)
@@ -24,7 +14,7 @@ function zfactor_renorm(dz, dzinv; isRenorm=true)
 end
 
 function process(para, datatuple, isSave)
-    dz, dzinv, dmu = UniElectronGas.get_dzmu(para, datatuple; parafile=parafilename, verbose=1, isSave)
+    dz, dzinv, dmu = UniElectronGas.get_dzmu(para, datatuple; parafile=parafilename, verbose=1, isSave=isSave)
 
     z = zfactor_renorm(dz, dzinv)
     println("Zfactor: ", z)
@@ -38,8 +28,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
         isSave = true
     end
 
-    f = jldopen(filename, "r")
-    println(filename)
+    f = jldopen(sigma_z_filename, "r")
     results = Any[]
     for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
         para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, spin=spin)
@@ -54,7 +43,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
         end
     end
     if isSave
-        open(savefilename, "a+") do io
+        open(zfactor_filename, "a+") do io
             writedlm(io, results)
         end
     end

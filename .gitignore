@@ -23,6 +23,7 @@ deps/src/
 *.aux
 *.DS_Store
 *.xdv
+*.xcf
 *.dat
 *.err
 *.out
@@ -50,3 +51,7 @@ Manifest.toml
 .history
 LocalPreferences.toml
 run/
+results/
+archives/
+benchmark/
+test_runs/

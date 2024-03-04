@@ -19,18 +19,14 @@ if abspath(PROGRAM_FILE) == @__FILE__
             loadpara = ParaMC(key)
             if UEG.paraid(loadpara) == UEG.paraid(para)
                 println(UEG.paraid(para))
-
-                ngrid, kgrid, rSw_k, iSw_k = UniElectronGas.getSigma(para, sigma_k_filename; parafile=parafilename)
-                meff, fit_p = UniElectronGas.getMeff(para, rSw_k, kgrid; parafile=parafilename)
-                # meff = UniElectronGas.getMeff(para, rSw_k, kgrid)
-                println("m* / m = ", meff)
-                push!(results, Any[_rs, _beta, _mass2, _order, meff...])
-                writedlm("fit.dat", fit_p)
+                zinv = UniElectronGas.getZfactor(para; parafile=parafilename, isRenorm=false)
+                println("1/z = ", zinv)
+                push!(results, Any[_rs, _beta, _mass2, _order, zinv...])
             end
         end
     end
     if isSave
-        open(meff_filename, "a+") do io
+        open(zfactor_filename, "a+") do io
             writedlm(io, results)
         end
     end
