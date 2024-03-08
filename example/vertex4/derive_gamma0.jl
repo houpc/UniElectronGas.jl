@@ -4,23 +4,27 @@ using JLD2, DelimitedFiles
 dim = 3
 spin = 2
 # rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
-rs = [0.5,]
+rs = [0.25,]
 # rs = [1.0, 2.0, 3.0, 4.0]
 # Fs = -[0.223, 0.380, 0.516, 0.639, 0.752]
 # Fs = -[0.223,]
 # rs = [1.0,]
 # mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0]
-mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
+# mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
 # mass2 = [9.0, 13.0, 19.0, 27.0]
 # mass2 = [1e-3,]
-# mass2 = [1.5,]
+mass2 = [1.5, 2.0]
+# mass2 = [2.44355,]
+# mass2 = [1.22177,]
+# mass2 = [0.814516,]
+# mass2 = [0.610887,]
 # mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 5.0]
-# mass2 = [2.5,]
+# mass2 = [3.5,]
 # Fs = [-0.0,]
 Fs = -0.0 .* rs
 beta = [100.0]
 # beta = [100.0]
-order = [3,]
+order = [4,]
 # order = [2,]
 Nl = 1
 # isDynamic = true
@@ -31,7 +35,9 @@ isFock = false
 const parafilename = "para_wn_1minus0.csv"
 # const filename = "data_ver4PP_profile.jld2"
 # const filename = "data_ver4PP_new.jld2"
-const filename = "data_ver4PP_parqAD.jld2"
+# const filename = "data_ver4PP_parqAD.jld2"
+# const filename = "data_ver4PP_parqAD_newsamp.jld2"
+const filename = "data_ver4PP_parqAD_newsamp_l10.jld2"
 # const filename = "data_ver4PP_beta200.jld2"
 # const filename = "data_ver4PP.jld2"
 # const savefilename1 = "guu_$(dim)d.dat"
@@ -42,8 +48,10 @@ const filename = "data_ver4PP_parqAD.jld2"
 # const savefilename2 = "garpa_$(dim)d.dat"
 # const savefilename1 = "gsyuk3_$(dim)d.dat"
 # const savefilename2 = "gayuk3_$(dim)d.dat"
-const savefilename1 = "gsingyuk3_$(dim)d_01.dat"
-const savefilename2 = "gtripyuk3_$(dim)d_01.dat"
+# const savefilename1 = "gsingyuk3_$(dim)d_01.dat"
+# const savefilename2 = "gtripyuk3_$(dim)d_01.dat"
+const savefilename1 = "gsingyuk3_$(dim)d_l10_01.dat"
+const savefilename2 = "gtripyuk3_$(dim)d_l10_01.dat"
 # const savefilename1 = "gsingrpa_$(dim)d.dat"
 # const savefilename2 = "gtriprpa_$(dim)d.dat"
 
@@ -79,6 +87,26 @@ function Un(Γlist4, Π, n)
                    3 * (Γlist[1]^2 * Π^2 * Γlist[3] + Γlist[2]^2 * Π^2 * Γlist[1])
                    -
                    4 * Γlist[1]^3 * Π^3 * Γlist[2] + Γlist[1]^5 * Π^4)
+    elseif n == 6
+        result += Γlist[1]
+        result += Γlist[2] - Γlist[1]^2 * Π
+        result += Γlist[3] - 2 * Γlist[1] * Π * Γlist[2] + Γlist[1]^3 * Π^2
+        result += Γlist[4] - 2 * Γlist[1] * Π * Γlist[3] + 3 * Γlist[1]^2 * Π^2 * Γlist[2] - Γlist[1]^4 * Π^3
+        result += (Γlist[5] - 2 * (Γlist[1] * Π * Γlist[4] + Γlist[2] * Π * Γlist[3])
+                   +
+                   3 * (Γlist[1]^2 * Π^2 * Γlist[3] + Γlist[2]^2 * Π^2 * Γlist[1])
+                   -
+                   4 * Γlist[1]^3 * Π^3 * Γlist[2] + Γlist[1]^5 * Π^4)
+        result += (Γlist[6] - 2 * (Γlist[1] * Π * Γlist[5] + Γlist[2] * Π * Γlist[4]) - Γlist[3] * Π * Γlist[3]
+                   +
+                   (3 * Γlist[1]^2 * Π^2 * Γlist[4] + 6 * Γlist[1] * Π * Γlist[2] * Π * Γlist[3] + Γlist[2] * Π * Γlist[2] * Π * Γlist[2])
+                   -
+                   4 * Γlist[1]^3 * Π^3 * Γlist[3] - 6 * Γlist[1]^2 * Π^3 * Γlist[2]^2
+                   +
+                   5 * Γlist[1]^4 * Π^4 * Γlist[2]
+                   -
+                   Γlist[1]^6 * Π^5)
+
     end
     return -result
 end

@@ -1,5 +1,6 @@
 using PyPlot
 using DelimitedFiles
+using LaTeXStrings
 
 dim = 3
 spin = 2
@@ -9,7 +10,9 @@ rs = [1.0]
 ells = [0,]
 # symmetry = true
 symmetry = false
-mass2 = [2.0, 2.5, 3.0, 3.5, 4.0, 5.0]
+# mass2 = [0.814516, 1.1, 1.25, 1.5, 2.0, 2.5, 3.0]
+# mass2 = [0.610887, 0.8, 1.0, 1.5, 2.0]
+mass2 = [1.0, 1.22177, 1.5, 2.0, 2.5, 3.0]
 # mass2 = [2.0, 2.5, 3.0, 3.5, 4.0]
 # mass2 = [1.0, 1.5, 2.0, 2.5, 3.0]
 # mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
@@ -45,10 +48,10 @@ function plot_convergence_v1(ver4, errors, _mass2=mass2, maxOrder=order[1]; rs=r
         errorbar(reducedx, reducedyval, yerr=reducedyerr, color=color[o], capsize=4, fmt="o-", markerfacecolor="none", label="$o")
     end
     # xlim(0.8, 4.5)
-    xlabel("lambda")
-    ylabel("\$U_$(ell)\$")
+    xlabel(L"$\lambda$")
+    ylabel(L"$u_c$")
     legend(title="order")
-    title("rs=$rs, beta=$beta")
+    title(L"$r_s=$" * "$(rs), " * L"$\beta=$" * "$beta" * L", $\omega_c=0.1E_F$")
     # title(r"$r_s=$(r_, beta=$")
     if symmetry
         savefig("Us$(dim)d_rs$(rs)_beta$(beta)_l$(ell)_conv.pdf")

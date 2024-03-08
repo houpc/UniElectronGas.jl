@@ -3,20 +3,20 @@ using ElectronLiquid, FeynmanDiagram, JLD2
 dim = 3
 # rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
 # rs = [1.0, 2.0, 3.0, 4.0, 5.0]
-rs = [0.5,]
+rs = [1.0,]
 # Fs = -[0.223, 0.380, 0.516, 0.639, 0.752]
 # Fs = -[0.223,]
-# mass2 = [1e-3,]
+mass2 = [3.5,]
 # mass2 = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
 # mass2 = [4.0, 5.0, 6.0]
-mass2 = [4.0,]
+# mass2 = [2.44355,]
 # Fs = [-0.0,]
 Fs = -0.0 .* rs
 beta = [100.0]
-order = [3,]
+order = [6,]
 # ell = [0, 1]
 ell = 0
-neval = 1e6
+neval = 1e4
 # neval = 1e8
 # isDynamic = true
 isDynamic = false
@@ -48,7 +48,9 @@ for (irs, _mass2, _beta, _order) in Iterators.product([i for i in 1:length(rs)],
     # reweight_goal = [1.0, 4.0, 8.0, 16.0, 4.0]
     println(reweight_goal)
 
-    ver4, result = Ver4.MC_PP_ParquetAD(para; l=ell, neval=neval, filename=filename, reweight_goal=reweight_goal, partition=partition, filter=[NoHartree,])
+    ver4, result = Ver4.MC_PP_ParquetAD_Clib(para; l=ell, neval=neval, filename=filename, partition=partition)
+    # ver4, result = Ver4.MC_PP_ParquetAD(para; l=ell, neval=neval, filename=filename, reweight_goal=reweight_goal, partition=partition, filter=[NoHartree, NoBubble], isClib=false)
+    # ver4, result = Ver4.MC_PP_ParquetAD(para; l=ell, neval=neval, filename=filename, reweight_goal=reweight_goal, partition=partition, filter=[NoHartree, NoBubble], isClib=true)
     # ver4, result = Ver4.MC_PP(para; l=ell, neval=neval, filename=filename, reweight_goal=reweight_goal, partition=partition, filter=[NoHartree, NoBubble])
     # ver4, result = Ver4.MC_PP(para; l=ell, neval=neval, filename=filename, reweight_goal=reweight_goal, partition=partition, filter=[NoHartree,])
     # ver4, result = Ver4.MC_PH(para; l=ell, neval=neval, filename=filename, partition=partition, filter=[NoHartree])
