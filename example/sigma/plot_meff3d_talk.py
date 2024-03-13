@@ -84,12 +84,13 @@ m_G0W0 = f_sigma_G0W0["mefflist"]
 # m_G0Wpm = f_sigma_G0Wpm["mefflist"]
 
 f_tree_level_G0W0 = np.load(
-    "results/finalized_meff_results/3d/rpa/meff_3d_tree_level_G0W0.npz")
+    "results/finalized_meff_results/3d/rpa/meff_3d_tree_level_G0W0_test.npz")
+    # "results/finalized_meff_results/3d/rpa/meff_3d_tree_level_G0W0.npz")
 rs_tree_level_G0W0 = f_tree_level_G0W0["rslist"]
 m_tree_level_G0W0 = f_tree_level_G0W0["mefflist"]
 
 f_tree_level_G0Wp = np.load(
-    "results/finalized_meff_results/3d/const/meff_3d_tree_level_G0Wp.npz")
+    "results/finalized_meff_results/3d/const/meff_3d_tree_level_G0Wp_test.npz")
 rs_tree_level_G0Wp = f_tree_level_G0Wp["rslist"]
 m_tree_level_G0Wp = f_tree_level_G0Wp["mefflist"]
 
@@ -144,6 +145,8 @@ def plot_mvsrs(rs, meff_data, idx, label, ls='-', ax=ax1, rs_HDL=None, meff_HDL=
 
 # Taylor series for m* / m in the high-density limit to leading order in rs in 3D
 # (c.f. Giuliani & Vignale, Quantum Theory of the Electron Liquid, 2008, p. 500)
+
+
 def high_density_limit(rs):
     alpha = (4.0 / (9.0 * np.pi))**(1.0 / 3.0)
     return 1 + alpha * rs * np.log(rs) / (2.0 * np.pi)
@@ -164,10 +167,10 @@ print(meff_HDL)
 # plot_mvsrs(rs_HDL_plot, meff_HDL_plot, 7, "HDL", "--", zorder=1000)
 
 # For paper
-reflabels = [" [12]", " [13]"]
+# reflabels = [" [12]", " [13]"]
 
 # For talk
-# reflabels = ["$^*$", "$^\dagger$"]
+reflabels = ["$^*$", "$^\dagger$"]
 
 # m_QMC = [m_DMC, m_SJVMC]
 # m_QMC_errs = [m_DMC_err, m_SJVMC_err]
@@ -188,6 +191,8 @@ mdats = [m_G0W0, m_tree_level_G0W0, m_tree_level_G0Wp]
 labels = [r"RPA", r"Tree-level $G_0 W_0$", r"Tree-level $G_0 W_{+}$"]
 for (rsdat, mdat, label) in zip(rsdats, mdats, labels):
     print("\nPlotting ", label)
+    # ax1.scatter(rsdat, mdat, color=Colormap[idx], s=10)
+    # handle = plot_mvsrs(rsdat, mdat, idx, label, '--')
     handle = plot_mvsrs(rsdat, mdat, idx, label, '--',
                         rs_HDL=rs_HDL, meff_HDL=meff_HDL)
     l1_handles.append(handle)
@@ -219,5 +224,5 @@ ax1.add_artist(bottom_legend)
 ax1.set_xticks([0, 1, 2, 3, 4, 5, 6])
 ax1.set_yticks([0.8, 0.85, 0.9, 0.95, 1.0, 1.05, 1.1])
 
-# Save the figure
-plt.savefig("figures/meff_3DUEG.pdf")
+# For talk
+plt.savefig("figures/meff_3DUEG_talk.pdf")

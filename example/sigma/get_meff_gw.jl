@@ -236,8 +236,9 @@ function get_meff_from_Σ_G0W(param::Parameter.Para; δK=5e-6, int_type=:rpa)
 
     # DLR cutoffs
     kF = param.kF
-    Euv, rtol_dlr = 1000 * param.EF, 1e-11
-    maxK, minK = 20kF, 1e-8kF
+    # Euv, rtol_dlr = 1000 * param.EF, 1e-11
+    Euv, rtol_dlr = 100 * param.EF, 1e-11
+    maxK, minK = 20kF, 1e-7kF
     Nk, order = 12, 8
 
     # Get Fermi liquid parameter F⁰ₛ(rs) from Perdew-Wang fit
@@ -276,7 +277,8 @@ end
 
 function main()
     # System parameters
-    dim = 3
+    dim = 2
+    # beta = 100.0
     beta = 1000.0
     δK = 5e-6
     # GW parameters
@@ -284,9 +286,9 @@ function main()
     atol = 1e-7
     alpha = 0.3
 
-    calc_g0w = false
-    calc_gw = true
-    save_sigma = true
+    calc_g0w = true
+    calc_gw = false
+    save_sigma = false
 
     # Output directory
     mkpath("results/finalized_meff_results/$(dim)d")
@@ -296,8 +298,9 @@ function main()
     # rslist = [0.005; collect(LinRange(0.0, 5.0, 101))[2:end]]  # for 2D
     # rslist = [0.01; collect(LinRange(0.0, 10.0, 101))[2:end]]  # for 3D
 
+    rslist = [0.001; collect(LinRange(0.0, 0.25, 5))[2:end]]
     # rslist = [0.001; collect(range(0.0, 1.1, step=0.05))[2:end]]  # for accurate 2D HDL
-    rslist = [0.01; collect(range(0.0, 10.0, step=0.5))[2:end]]  # for 3D
+    # rslist = [0.01; collect(range(0.0, 10.0, step=0.5))[2:end]]  # for 3D
     # rslist = [1.0, 3.0]
 
     # NOTE: int_type ∈ [:ko_const, :ko_takada_plus, :ko_takada, :ko_moroni, :ko_simion_giuliani] 
