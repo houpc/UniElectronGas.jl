@@ -21,9 +21,11 @@ include("../input.jl")
 # isDynamic = false
 ### dSigma/dk = (Sigma[kF_label+idx_dk] - Sigma[kF_label-idx_dk]) / (kgrid[kF_label+idx_dk] - kgrid[kF_label-idx_dk])
 
-# const parafilename = "para_wn_1minus0.csv"
-const filename = "./data$(dim)d/data$(dim)d_K.jld2"
+const filename = "./data$(dim)d/data$(dim)d_K_th.jld2"
+# const filename = "./data$(dim)d/data$(dim)d_K_thyj.jld2"
 # const filename = "./data$(dim)d/data$(dim)d_K_o5.jld2"
+# const filename = "./data$(dim)d/data$(dim)d_K_GV_rs1.0.jld2"
+# const filename = "./data$(dim)d/data$(dim)d_K_GV_spin_polarized.jld2"
 const savefilename = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$spin.dat"
 
 if abspath(PROGRAM_FILE) == @__FILE__
@@ -43,12 +45,19 @@ if abspath(PROGRAM_FILE) == @__FILE__
             if UEG.paraid(loadpara) == UEG.paraid(para)
                 println(UEG.paraid(para))
 
-                ngrid, kgrid, rSw_k, iSw_k = UniElectronGas.getSigma(para, filename)
-                meff, fit_p = UniElectronGas.getMeff(para, rSw_k, kgrid)
-                # meff = UniElectronGas.getMeff(para, rSw_k, kgrid)
+                ngrid, kgrid, rSw_k, iSw_k = UniElectronGas.getSigma(para, filename, parafile=parafilename)
+                for o in 1:5
+                    println(rSw_k[o])
+                end
+
+                # meff, fit_p = UniElectronGas.getMeff(para, rSw_k, kgrid, parafile=parafilename)
+                # for idx_dk in 1:5
+                #     meff = UniElectronGas.getMeff(para, rSw_k, kgrid, idx_dk, parafile=parafilename)
+                # end
+                meff = UniElectronGas.getMeff(para, rSw_k, kgrid, 2, parafile=parafilename)
                 println("m* / m = ", meff)
                 push!(results, Any[_rs, _beta, _mass2, _order, meff...])
-                writedlm("fit.dat", fit_p)
+                # writedlm("fit.dat", fit_p)
             end
         end
     end

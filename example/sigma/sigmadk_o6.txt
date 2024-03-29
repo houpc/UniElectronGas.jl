@@ -1,0 +1,224 @@
+Group (1, 0, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.009385 ±   0.000004     0.000000 ±   0.000000
+Group (1, 0, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.015271 ±   0.000009     0.000000 ±   0.000000
+Group (1, 0, 2)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.018808 ±   0.000009     0.000000 ±   0.000000
+Group (1, 0, 3)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.020768 ±   0.000009     0.000000 ±   0.000000
+Group (1, 0, 4)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.021670 ±   0.000008     0.000000 ±   0.000000
+Group (1, 0, 5)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.021910 ±   0.000008     0.000000 ±   0.000000
+Group (1, 1, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.083674 ±   0.000032     0.000000 ±   0.000000
+Group (1, 1, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.127659 ±   0.000045     0.000000 ±   0.000000
+Group (1, 1, 2)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.147599 ±   0.000049     0.000000 ±   0.000000
+Group (1, 1, 3)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.153359 ±   0.000050     0.000000 ±   0.000000
+Group (1, 1, 4)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.151142 ±   0.000048     0.000000 ±   0.000000
+Group (1, 2, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.052452 ±   0.000629     0.000000 ±   0.000000
+Group (1, 2, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.010771 ±   0.000734     0.000000 ±   0.000000
+Group (1, 2, 2)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.064201 ±   0.000637     0.000000 ±   0.000000
+Group (1, 2, 3)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.145532 ±   0.000390     0.000000 ±   0.000000
+Group (1, 3, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.276062 ±   0.027751     0.000000 ±   0.000000
+Group (1, 3, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.462133 ±   0.032597     0.000000 ±   0.000000
+Group (1, 3, 2)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.638021 ±   0.022858     0.000000 ±   0.000000
+Group (1, 4, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -1.678949 ±   1.243143     0.000000 ±   0.000000
+Group (1, 4, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -1.361555 ±   1.144950     0.000000 ±   0.000000
+Group (1, 5, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309  -68.870689 ±  49.144178     0.000000 ±   0.000000
+Group (2, 0, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.003064 ±   0.000010    -0.000318 ±   0.000001
+Group (2, 0, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.004781 ±   0.000010    -0.000566 ±   0.000001
+Group (2, 0, 2)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.005643 ±   0.000009    -0.000764 ±   0.000001
+Group (2, 0, 3)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.005933 ±   0.000008    -0.000926 ±   0.000001
+Group (2, 0, 4)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.005834 ±   0.000006    -0.001053 ±   0.000001
+Group (2, 1, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.019060 ±   0.000535     0.001416 ±   0.000081
+Group (2, 1, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.023157 ±   0.000534     0.003253 ±   0.000100
+Group (2, 1, 2)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.014029 ±   0.000477     0.005421 ±   0.000095
+Group (2, 1, 3)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.000002 ±   0.000307     0.007944 ±   0.000066
+Group (2, 2, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.107608 ±   0.033972     0.012721 ±   0.005592
+Group (2, 2, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.241715 ±   0.034682     0.036338 ±   0.007065
+Group (2, 2, 2)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.447253 ±   0.024699     0.040919 ±   0.005275
+Group (2, 3, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.177453 ±   1.899249    -0.693422 ±   0.365377
+Group (2, 3, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    2.327725 ±   1.566189    -1.452530 ±   0.355648
+Group (2, 4, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -8.671829 ±  93.139307   -47.993441 ±  18.844792
+Group (3, 0, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.000656 ±   0.000011     0.000247 ±   0.000002
+Group (3, 0, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.000224 ±   0.000018     0.000545 ±   0.000003
+Group (3, 0, 2)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.001067 ±   0.000022     0.000855 ±   0.000004
+Group (3, 0, 3)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.002743 ±   0.000019     0.001184 ±   0.000004
+Group (3, 1, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.002920 ±   0.001191    -0.001538 ±   0.000222
+Group (3, 1, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.001590 ±   0.001958    -0.002827 ±   0.000406
+Group (3, 1, 2)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.007240 ±   0.001948    -0.004595 ±   0.000423
+Group (3, 2, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.231538 ±   0.105473    -0.063234 ±   0.020459
+Group (3, 2, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.157040 ±   0.148934    -0.138431 ±   0.032781
+Group (3, 3, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -5.987449 ±   7.467881     1.443339 ±   1.531077
+Group (4, 0, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.000820 ±   0.000019    -0.000158 ±   0.000004
+Group (4, 0, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.001684 ±   0.000041    -0.000431 ±   0.000009
+Group (4, 0, 2)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.002139 ±   0.000052    -0.000707 ±   0.000011
+Group (4, 1, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.005541 ±   0.002719     0.001170 ±   0.000559
+Group (4, 1, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.008484 ±   0.005291     0.002476 ±   0.001137
+Group (4, 2, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.112260 ±   0.262183     0.049197 ±   0.055325
+Group (5, 0, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.000443 ±   0.000032     0.000093 ±   0.000008
+Group (5, 0, 1)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.000913 ±   0.000079     0.000291 ±   0.000019
+Group (5, 1, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309    0.007128 ±   0.005304    -0.001561 ±   0.001187
+Group (6, 0, 0)
+      q/kF   real(avg)          err    imag(avg)          err
+n = 0
+  2.605309   -0.000296 ±   0.000063    -0.000065 ±   0.000015

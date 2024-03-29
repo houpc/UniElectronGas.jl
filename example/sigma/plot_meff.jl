@@ -5,18 +5,18 @@ using CurveFit
 # @pyimport scienceplots  # `import scienceplots` is required as of version 2.0.0
 @pyimport scipy.interpolate as interp
 
-dim = 2
+include("../input.jl")
+
+# dim = 2
 # spin = 2
-spin = 1
-# rs = [0.5, 1.0, 4.0]
-# rs = [0.5]
-rs = [1.0]
+# # spin = 1
+# rs = [0.1, 0.3, 0.5]
 # mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]
-mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0, 8.0]
-# mass2 = [1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
-Fs = [-0.0,]
-beta = [25.0]
-order = [4,]
+# # mass2 = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0, 8.0]
+# # mass2 = [1.5, 2.0, 2.2, 2.4, 2.5, 2.6, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0, 7.0, 8.0]
+# Fs = [-0.0,]
+# beta = [25.0]
+# # order = [4,]
 # order = [5,]
 const fileName = spin == 2 ? "meff_$(dim)d.dat" : "meff_$(dim)d_spin$spin.dat"
 
@@ -85,7 +85,8 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
     legend_loc = 4
     if spin == 2
         if rs == 0.1
-            mres = [0.9665, 0.9675, 0.9685]
+            # mres = [0.9665, 0.9675, 0.9685]
+            mres = [0.9666, 0.9674, 0.9682]
             xlim(0.8, 5.2)    #rs=0.1
             ylim(0.961, 0.975)
         elseif rs == 0.3
@@ -94,7 +95,7 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
             ylim(0.937, 0.961)
         elseif rs == 0.5
             mres = [0.9495, 0.952, 0.9545]
-            xlim(0.8, 4.7)    #rs=0.5
+            xlim(0.8, 5.2)    #rs=0.5
             ylim(0.94, 0.98)
             legend_loc = 2
         elseif rs == 1.0
@@ -102,13 +103,18 @@ function plot_convergence_v1(meff, errors, _mass2=mass2, maxOrder=order[1]; rs=r
             xlim(0.8, 5.2)    #rs=1
             ylim(0.945, 0.992)
             # ylim(0.88, 1.0)
+        elseif rs == 1.5
+            mres = [0.966, 0.97, 0.974]
+            xlim(0.8, 5.7)    #rs=1
+            ylim(0.945, 0.992)
+            # ylim(0.88, 1.0)
         end
     elseif spin == 1
         xlim(0.4, 2.1)
         ylim(0.8, 0.9)
     end
-    # axhspan(mres[1], mres[3], color=cdict["cyan"], alpha=0.5)
-    # plot([0, 6], [mres[2], mres[2]], color="black", ls="--")
+    axhspan(mres[1], mres[3], color=cdict["cyan"], alpha=0.5)
+    plot([0, 6], [mres[2], mres[2]], color="black", ls="--")
 
     xlabel("\$\\lambda\$ (Ry)")
     ylabel("\$m^*/m\$")

@@ -6,12 +6,13 @@ include("../input.jl")
 if isLayered2D
     const filename = "./data$(dim)d/data_Z_layered2d.jld2"
 else
-    const filename = "./data$(dim)d/data_Z.jld2"
+    # const filename = "./data$(dim)d/data$(dim)d_Z_o5.jld2"
+    const filename = "./data$(dim)d/data$(dim)d_Z_th.jld2"
+    # const filename = "./data$(dim)d/data$(dim)d_Z_Tscaling.jld2"
+    # const filename = "./data$(dim)d/data$(dim)d_Z_Tscaling_n1.jld2"
 end
-# const filename = "./data2d_Z_v0.jld2"
-# const filename = "./data$(dim)d/data$(dim)d_Z_beta80_rs$(rs[1]).jld2"
 const savefilename = spin == 2 ? "zfactor_$(dim)d.dat" : "zfactor_$(dim)d_spin$spin.dat"
-
+# const savefilename = "zfactor_$(dim)d_o2.dat"
 
 function zfactor_renorm(dz, dzinv; isRenorm=true)
     if isRenorm
@@ -23,6 +24,8 @@ function zfactor_renorm(dz, dzinv; isRenorm=true)
     end
 end
 
+# function process(para, datatuple, datatuple1, isSave)
+# dz, dzinv, dmu = UniElectronGas.get_dzmu(para, datatuple, datatuple1; parafile=parafilename, verbose=1, isSave)
 function process(para, datatuple, isSave)
     dz, dzinv, dmu = UniElectronGas.get_dzmu(para, datatuple; parafile=parafilename, verbose=1, isSave)
 
@@ -39,16 +42,20 @@ if abspath(PROGRAM_FILE) == @__FILE__
     end
 
     f = jldopen(filename, "r")
+    # f1 = jldopen(filename1, "r")
     println(filename)
     results = Any[]
     for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
         para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, spin=spin)
         kF = para.kF
         for key in keys(f)
+            # println(key)
+            # println(f[key])
             loadpara = ParaMC(key)
             if UEG.paraid(loadpara) == UEG.paraid(para)
                 println("loading ... ", UEG.paraid(para))
                 zfactor = process(para, f[key], isSave)
+                # zfactor = process(para, f[key], f1[key], isSave)
                 push!(results, Any[_rs, _beta, _mass2, _order, zfactor...])
             end
         end

@@ -15,7 +15,7 @@ Nl = 2
 include("../input.jl")
 
 # const parafilename = "para_wn_1minus0.csv"
-const filename = "data_ver4PH.jld2"
+const filename = "data$(dim)d_ver4PH.jld2"
 const savefilename1 = "Fsl_$(dim)d.dat"
 const savefilename2 = "Fal_$(dim)d.dat"
 
