@@ -31,14 +31,6 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
         error("unknown mission")
     end
 
-    if isLayered2D
-        filename = "./data$(dim)d/data_$(mission)_layered2d.jld2"
-    else
-        # filename = "./data$(dim)d/data$(dim)d_$(mission)_test.jld2"
-        filename = "./data$(dim)d/data_Z_test.jld2"
-    end
-    # filename = "data$(dim)_$(mission).jld2"
-
     partition = UEG.partition(_order)
     reweight_goal = Float64[]
     for (order, sOrder, vOrder) in partition
@@ -50,9 +42,9 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     end
     push!(reweight_goal, 4.0)
 
-    sigma, result = Sigma.MC(para; kgrid=kgrid, ngrid=ngrid, spinPolarPara=spinPolarPara,
+    filename = mission == "Z" ? sigma_z_filename : sigma_k_filename
+    # sigma, result = Sigma.MC(para; kgrid=kgrid, ngrid=ngrid, 
+    sigma, result = Sigma.MC_Clib(para; kgrid=kgrid, ngrid=ngrid,
         neval=neval, filename=filename, partition=partition, reweight_goal=reweight_goal,
-        # isLayered2D=isLayered2D,
-        diagtype=diagGenerate)
-    # isClib=false)
+        isLayered2D=isLayered2D)
 end

@@ -10,12 +10,6 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     kgrid = [para.kF]
     ngrid = [0,]
 
-    if isLayered2D
-        filename = "./data$(dim)d/data$(dim)d_dSig_layered2d.jld2"
-    else
-        filename = "./data$(dim)d/data$(dim)d_dSig_test.jld2"
-    end
-
     partition = UEG.partition(_order)
     reweight_goal = Float64[]
     for (order, sOrder, vOrder) in partition
@@ -27,9 +21,10 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     end
     push!(reweight_goal, 4.0)
 
-    sigma, result = Sigma.MC_dk(para; kgrid=kgrid, ngrid=ngrid, spinPolarPara=spinPolarPara,
+    filename = mission == "Z" ? sigma_z_filename : sigma_k_filename
+
+    # sigma, result = Sigma.MC_dk(para; kgrid=kgrid, ngrid=ngrid,
+    sigma, result = Sigma.MC_dk_Clib(para; kgrid=kgrid, ngrid=ngrid,
         neval=neval, filename=filename, partition=partition, reweight_goal=reweight_goal,
-        diagtype=diagGenerate,)
-    # isLayered2D=isLayered2D,
-    # isClib=false)
+        diagtype=diagGenerate, isLayered2D=isLayered2D)
 end

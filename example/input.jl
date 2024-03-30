@@ -1,36 +1,75 @@
-# dim = 2 # dimension of the problem
-dim = 3 # dimension of the problem
-# rs = [0.5]
-# rs = [5.0]
-rs = [1.0]
-# mass2 = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0,]  # screening parameter
-# mass2 = [1.125]  # screening parameter
-mass2 = [1.0,]  # screening parameter
-Fs = [-0.0,]    # Fermi liquid parameter with zero angular momentum
-# beta = [10.0, 20.0, 40.0, 80.0, 160.0]   # inverse temperature beta = β*E_F 
-# beta = [5.0, 10.0, 20.0, 40.0, 80.0, 160.0]   # inverse temperature beta = β*E_F 
-# beta = [80.0,]   # inverse temperature beta = β*E_F 
-beta = [25.0,]   # inverse temperature beta = β*E_F 
-order = [4,]    # order of diagrams
-# order = [5,]    # order of diagrams
-# neval = 5e7    # number of Monte Carlo samples
-# order = [6,]    # order of diagrams
-neval = 1e7    # number of Monte Carlo samples
-isDynamic = false # whether to use effective field theory with dynamic screening or not 
-isFock = false # whether to use Fock renormalization or not
+# Use finalized lambda scans to determine mass2 for maximum orders N = 4, 5, 6
+include("lambda_scans.jl")
+dim = 3      # dimension of the problem
+rs = [6.0]
+order = [5]  # maximum diagram order of the run
+mass2 = rs_to_lambdas[dim][order[1]][rs[1]]
 
-# diagGenerate = :GV # :GV or :Parquet, algorithm to generate diagrams
-diagGenerate = :Parquet
-# isLayered2D = true # whether to use layered 2D system or not
-isLayered2D = false # whether to use layered 2D system or not
+Fs = [-0.0]        # Fermi liquid parameter with zero angular momentum
+beta = [40.0]      # inverse temperature beta = β*E_F 
+neval = 1e11       # number of Monte Carlo samples
+isDynamic = false  # whether to use effective field theory with dynamic screening or not 
+isFock = false     # whether to use Fock renormalization or not
+
+diagGenerate = :GV   # :GV or :Parquet, algorithm to generate diagrams
+isLayered2D = false  # whether to use layered 2D system or not
 
 spin = 2    # 2 for unpolarized, 1 for polarized
 # spin = 1    # 2 for unpolarized, 1 for polarized
-spinPolarPara = 2 / spin - 1 # spin-polarization parameter (n_up - n_down) / (n_up + n_down) ∈ [0,1]
+# spinPolarPara = 2 / spin - 1 # spin-polarization parameter (n_up - n_down) / (n_up + n_down) ∈ [0,1]
+ispolarized = spin < 2
 
-if isLayered2D
-    const parafilename = "para_wn_1minus0_layered2d.csv"
-else
-    # const parafilename = "para_wn_1minus0.csv"
-    const parafilename = "para_wn_1minus0_3d.csv"
+println("rs = $rs, mass2 = $mass2, order = $order, neval = $neval")
+
+# Build file base names
+basenames = [
+    "para_wn_1minus0",
+    "data$(dim)d_Z",
+    "data$(dim)d_K",
+    "meff_$(dim)d",
+    "inverse_meff_$(dim)d",
+    "zfactor_$(dim)d",
+    "inverse_zfactor_$(dim)d",
+    "chemical_potential_$(dim)d",
+    "dispersion_ratio_$(dim)d",
+    "inverse_dispersion_ratio_$(dim)d",
+]
+for i in eachindex(basenames)
+    if spin != 2
+        basenames[i] *= "_spin$(spin)"
+    end
+    if ispolarized
+        basenames[i] *= "_polarized"
+    end
+    if isLayered2D
+        @assert dim == 2 "Layered 2D mode is only available for dim = 2!"
+        basenames[i] *= "_layered2d"
+    end
 end
+para_basename,
+sigma_z_basename,
+sigma_k_basename,
+meff_basename,
+inverse_meff_basename,
+zfactor_basename,
+inverse_zfactor_basename,
+chemical_potential_basename,
+dispersion_ratio_basename,
+inverse_dispersion_ratio_basename = basenames
+
+# Directory paths
+data_directory = joinpath(@__DIR__, "sigma/data$(dim)d")
+res_directory = joinpath(@__DIR__, "sigma")
+para_directory = ""  # src directory
+
+# File paths
+const parafilename = joinpath(para_directory, para_basename * ".csv")
+const sigma_z_filename = joinpath(data_directory, sigma_z_basename * ".jld2")
+const sigma_k_filename = joinpath(data_directory, sigma_k_basename * ".jld2")
+const meff_filename = joinpath(res_directory, meff_basename * ".dat")
+const inverse_meff_filename = joinpath(res_directory, inverse_meff_basename * ".dat")
+const zfactor_filename = joinpath(res_directory, zfactor_basename * ".dat")
+const zinv_filename = joinpath(res_directory, inverse_zfactor_basename * ".dat")
+const chemical_potential_filename = joinpath(res_directory, chemical_potential_basename * ".dat")
+const dispersion_ratio_filename = joinpath(res_directory, dispersion_ratio_basename * ".dat")
+const inverse_dispersion_ratio_filename = joinpath(res_directory, inverse_dispersion_ratio_basename * ".dat")
