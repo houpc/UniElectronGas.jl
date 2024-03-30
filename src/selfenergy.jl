@@ -3,7 +3,7 @@ function sigma(para; neval=1e6, ngrid=[-1, 0, 1], kgrid=[para.kF], filename=noth
     return sigma, result
 end
 
-function loaddata(para, FileName)
+function loaddata(para, FileName, isdk=false)
     key = UEG.short(para)
     f = jldopen(FileName, "r")
 
@@ -13,8 +13,13 @@ function loaddata(para, FileName)
     rdata, idata = Dict(), Dict()
     for p in _partition
         # for p in sort([k for k in keys(data)])
-        rdata[p] = real(sigma[p][:, :])
-        idata[p] = imag(sigma[p][:, :])
+        if isdk
+            rdata[p] = real(sigma[(p..., 1)][:, :])
+            idata[p] = imag(sigma[(p..., 1)][:, :])
+        else
+            rdata[p] = real(sigma[p][:, :])
+            idata[p] = imag(sigma[p][:, :])
+        end
         println(p, " ", rdata[p])
     end
     return ngrid, kgrid, rdata, idata
@@ -110,55 +115,69 @@ function getSigma(para, filename=filename; parafile="para_wn_1minus0.csv", root_
     dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
     println("dmu: ", dmu)
 
-    for (p, val) in rdata
-        p == (6, 0, 0) && println("(6,0,0): ", val)
-        p == (5, 0, 1) && println("(5,0,1): ", val)
-        p == (5, 1, 0) && println("(5,1,0): ", val * dmu[1])
-        p == (4, 1, 1) && println("(4,1,1): ", val * dmu[1])
-        p == (4, 2, 0) && println("(4,2,0): ", val * dmu[1]^2)
-        p == (3, 3, 0) && println("(3,3,0): ", val * dmu[1]^3)
-        p == (2, 4, 0) && println("(2,4,0): ", val * dmu[1]^4)
-        p == (1, 5, 0) && println("(1,5,0): ", val * dmu[1]^5)
-        p == (4, 1, 0) && println("(4,1,0): ", val * dmu[2])
-        p == (3, 2, 0) && println("(3,2,0): ", val * 2 * dmu[1] * dmu[2])
-        p == (2, 3, 0) && println("(2,3,0): ", val * 3 * dmu[1]^2 * dmu[2])
-        p == (2, 2, 0) && println("(2,2,0): ", val * (2 * dmu[1] * dmu[3] + dmu[2]^2))
-        p == (3, 1, 0) && println("(3,1,0): ", val * dmu[3])
-        p == (1, 1, 0) && println("(1,1,0): ", val * dmu[5])
-    end
-    println()
-    for (p, val) in rdata
-        p == (5, 0, 0) && println("(5,0,0): ", val)
-        p == (4, 0, 1) && println("(4,0,1): ", val)
-        p == (4, 1, 0) && println("(4,1,0): ", val * dmu[1])
-        p == (3, 1, 1) && println("(3,1,1): ", val * dmu[1])
-        p == (3, 2, 0) && println("(3,2,0): ", val * dmu[1]^2)
-        p == (2, 3, 0) && println("(2,3,0): ", val * dmu[1]^3)
-        p == (1, 4, 0) && println("(1,4,0): ", val * dmu[1]^4)
-        p == (3, 1, 0) && println("(3,1,0): ", val * dmu[2])
-        p == (2, 2, 0) && println("(2,2,0): ", val * 2 * dmu[1] * dmu[2])
-        p == (1, 3, 0) && println("(1,3,0): ", val * 3 * dmu[1]^2 * dmu[2])
-        p == (1, 2, 0) && println("(1,2,0): ", val * (2 * dmu[1] * dmu[3] + dmu[2]^2))
-        p == (2, 1, 0) && println("(2,1,0): ", val * dmu[3])
-        p == (1, 1, 0) && println("(1,1,0): ", val * dmu[4])
-    end
-    println()
-    for (p, val) in rdata
-        p == (4, 0, 0) && println("(4,0,0): ", val)
-        p == (3, 0, 1) && println("(3,0,1): ", val)
-        p == (3, 1, 0) && println("(3,1,0): ", val * dmu[1])
-        p == (2, 1, 1) && println("(2,1,1): ", val * dmu[1])
-        p == (2, 2, 0) && println("(2,2,0): ", val * dmu[1]^2)
-        p == (1, 3, 0) && println("(1,3,0): ", val * dmu[1]^3)
-        p == (2, 1, 0) && println("(2,1,0): ", val * dmu[2])
-        p == (1, 2, 0) && println("(1,2,0): ", val * 2 * dmu[1] * dmu[2])
-        p == (1, 1, 0) && println("(1,1,0): ", val * dmu[3])
-    end
+    # for (p, val) in rdata
+    #     p == (6, 0, 0) && println("(6,0,0): ", val)
+    #     p == (5, 0, 1) && println("(5,0,1): ", val)
+    #     p == (5, 1, 0) && println("(5,1,0): ", val * dmu[1])
+    #     p == (4, 1, 1) && println("(4,1,1): ", val * dmu[1])
+    #     p == (4, 2, 0) && println("(4,2,0): ", val * dmu[1]^2)
+    #     p == (3, 3, 0) && println("(3,3,0): ", val * dmu[1]^3)
+    #     p == (2, 4, 0) && println("(2,4,0): ", val * dmu[1]^4)
+    #     p == (1, 5, 0) && println("(1,5,0): ", val * dmu[1]^5)
+    #     p == (4, 1, 0) && println("(4,1,0): ", val * dmu[2])
+    #     p == (3, 2, 0) && println("(3,2,0): ", val * 2 * dmu[1] * dmu[2])
+    #     p == (2, 3, 0) && println("(2,3,0): ", val * 3 * dmu[1]^2 * dmu[2])
+    #     p == (2, 2, 0) && println("(2,2,0): ", val * (2 * dmu[1] * dmu[3] + dmu[2]^2))
+    #     p == (3, 1, 0) && println("(3,1,0): ", val * dmu[3])
+    #     p == (1, 1, 0) && println("(1,1,0): ", val * dmu[5])
+    # end
+    # println()
+    # for (p, val) in rdata
+    #     p == (5, 0, 0) && println("(5,0,0): ", val)
+    #     p == (4, 0, 1) && println("(4,0,1): ", val)
+    #     p == (4, 1, 0) && println("(4,1,0): ", val * dmu[1])
+    #     p == (3, 1, 1) && println("(3,1,1): ", val * dmu[1])
+    #     p == (3, 2, 0) && println("(3,2,0): ", val * dmu[1]^2)
+    #     p == (2, 3, 0) && println("(2,3,0): ", val * dmu[1]^3)
+    #     p == (1, 4, 0) && println("(1,4,0): ", val * dmu[1]^4)
+    #     p == (3, 1, 0) && println("(3,1,0): ", val * dmu[2])
+    #     p == (2, 2, 0) && println("(2,2,0): ", val * 2 * dmu[1] * dmu[2])
+    #     p == (1, 3, 0) && println("(1,3,0): ", val * 3 * dmu[1]^2 * dmu[2])
+    #     p == (1, 2, 0) && println("(1,2,0): ", val * (2 * dmu[1] * dmu[3] + dmu[2]^2))
+    #     p == (2, 1, 0) && println("(2,1,0): ", val * dmu[3])
+    #     p == (1, 1, 0) && println("(1,1,0): ", val * dmu[4])
+    # end
+    # println()
+    # for (p, val) in rdata
+    #     p == (4, 0, 0) && println("(4,0,0): ", val)
+    #     p == (3, 0, 1) && println("(3,0,1): ", val)
+    #     p == (3, 1, 0) && println("(3,1,0): ", val * dmu[1])
+    #     p == (2, 1, 1) && println("(2,1,1): ", val * dmu[1])
+    #     p == (2, 2, 0) && println("(2,2,0): ", val * dmu[1]^2)
+    #     p == (1, 3, 0) && println("(1,3,0): ", val * dmu[1]^3)
+    #     p == (2, 1, 0) && println("(2,1,0): ", val * dmu[2])
+    #     p == (1, 2, 0) && println("(1,2,0): ", val * 2 * dmu[1] * dmu[2])
+    #     p == (1, 1, 0) && println("(1,1,0): ", val * dmu[3])
+    # end
 
     rSw_k = CounterTerm.chemicalpotential_renormalization(para.order, rdata, dmu)
     # rSw_k = CounterTerm.chemicalpotential_renormalization(para.order, rdata, dmu, verbose=1)
     iSw_k = CounterTerm.chemicalpotential_renormalization(para.order, idata, dmu)
 
+    return ngrid, kgrid, rSw_k, iSw_k
+end
+
+function get_dSigmadk(para, filename=filename; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    ngrid, kgrid, rdata, idata = loaddata(para, filename, true)
+    # para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=5, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
+    # _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+
+    dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
+    println("dmu: ", dmu)
+
+    rSw_k = CounterTerm.chemicalpotential_renormalization(para.order, rdata, dmu)
+    iSw_k = CounterTerm.chemicalpotential_renormalization(para.order, idata, dmu)
     return ngrid, kgrid, rSw_k, iSw_k
 end
 
@@ -398,6 +417,7 @@ function getMeffInv(para, rSigma, kgrid::Vector{Float64}; parafile="para_wn_1min
     return @. 1.0 + sumMeffInv, fit_parameters
 end
 
+# Extract the effective mass from dΣ/dk
 function getMeff(para, rSigmadk; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
     order, kF = para.order, para.kF
 

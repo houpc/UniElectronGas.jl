@@ -21,10 +21,10 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     end
     push!(reweight_goal, 4.0)
 
-    filename = mission == "Z" ? sigma_z_filename : sigma_k_filename
+    filename = sigmadk_filename
 
     # sigma, result = Sigma.MC_dk(para; kgrid=kgrid, ngrid=ngrid,
     sigma, result = Sigma.MC_dk_Clib(para; kgrid=kgrid, ngrid=ngrid,
         neval=neval, filename=filename, partition=partition, reweight_goal=reweight_goal,
-        diagtype=diagGenerate, isLayered2D=isLayered2D)
+        isLayered2D=isLayered2D)
 end

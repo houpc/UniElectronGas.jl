@@ -25,7 +25,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
             if UEG.paraid(loadpara) == UEG.paraid(para)
                 println(UEG.paraid(para))
 
-                ngrid, kgrid, rSw_k, iSw_k = UniElectronGas.getSigma(para, filename; parafile=parafilename)
+                ngrid, kgrid, rSw_k, iSw_k = UniElectronGas.get_dSigmadk(para, filename; parafile=parafilename)
                 meff = UniElectronGas.getMeff(para, [rSw_k[i][1] for i in eachindex(rSw_k)]; parafile=parafilename)
 
                 # println(rSw_k .* para.me / kF)

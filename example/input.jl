@@ -26,6 +26,7 @@ basenames = [
     "para_wn_1minus0",
     "data$(dim)d_Z",
     "data$(dim)d_K",
+    "data$(dim)d_dk",
     "meff_$(dim)d",
     "inverse_meff_$(dim)d",
     "zfactor_$(dim)d",
@@ -49,6 +50,7 @@ end
 para_basename,
 sigma_z_basename,
 sigma_k_basename,
+sigmadk_basename,
 meff_basename,
 inverse_meff_basename,
 zfactor_basename,
@@ -66,6 +68,7 @@ para_directory = ""  # src directory
 const parafilename = joinpath(para_directory, para_basename * ".csv")
 const sigma_z_filename = joinpath(data_directory, sigma_z_basename * ".jld2")
 const sigma_k_filename = joinpath(data_directory, sigma_k_basename * ".jld2")
+const sigmadk_filename = joinpath(data_directory, sigmadk_basename * ".jld2")
 const meff_filename = joinpath(res_directory, meff_basename * ".dat")
 const inverse_meff_filename = joinpath(res_directory, inverse_meff_basename * ".dat")
 const zfactor_filename = joinpath(res_directory, zfactor_basename * ".dat")
