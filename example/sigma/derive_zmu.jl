@@ -30,13 +30,7 @@ if abspath(PROGRAM_FILE) == @__FILE__
         isSave = true
     end
 
-<<<<<<< HEAD
-    f = jldopen(filename, "r")
-    # f1 = jldopen(filename1, "r")
-    println(filename)
-=======
     f = jldopen(sigma_z_filename, "r")
->>>>>>> master
     results = Any[]
     for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
         para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, spin=spin)
