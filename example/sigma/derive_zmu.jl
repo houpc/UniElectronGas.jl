@@ -13,6 +13,8 @@ function zfactor_renorm(dz, dzinv; isRenorm=false)
     end
 end
 
+# function process(para, datatuple, datatuple1, isSave)
+# dz, dzinv, dmu = UniElectronGas.get_dzmu(para, datatuple, datatuple1; parafile=parafilename, verbose=1, isSave)
 function process(para, datatuple, isSave)
     dz, dzinv, dmu = UniElectronGas.get_dzmu(para, datatuple; parafile=parafilename, verbose=1, isSave=isSave)
 
@@ -34,10 +36,13 @@ if abspath(PROGRAM_FILE) == @__FILE__
         para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, spin=spin)
         kF = para.kF
         for key in keys(f)
+            # println(key)
+            # println(f[key])
             loadpara = ParaMC(key)
             if UEG.paraid(loadpara) == UEG.paraid(para)
                 println("loading ... ", UEG.paraid(para))
                 zfactor = process(para, f[key], isSave)
+                # zfactor = process(para, f[key], f1[key], isSave)
                 push!(results, Any[_rs, _beta, _mass2, _order, zfactor...])
             end
         end

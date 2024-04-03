@@ -6,7 +6,7 @@ using MCIntegration
 using ElectronLiquid
 using Measurements
 using GreenFunc
-using FeynmanDiagram
+# using FeynmanDiagram
 
 using LinearAlgebra, TaylorSeries, LsqFit
 using Lehmann
