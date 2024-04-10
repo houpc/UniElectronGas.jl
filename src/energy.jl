@@ -34,10 +34,10 @@ function getEnergy(para, filename, E0=nothing; parafile="para_wn_1minus0.csv", r
     end
 
     E_eachorder = dF_eachorder .+ dF0_eachorder
-    println("free energy/V from each order: ", E_eachorder)
+    println("correlation energy/V from each order: ", E_eachorder)
     F = accumulate(+, E_eachorder) ./ density
-    println("free energy/N at each order (Rydberg): ", F)
-    println("free energy/N at each order (Ha): ", F ./ 2)
+    println("correlation energy/N at each order (Rydberg): ", F)
+    println("correlation energy/N at each order (Ha): ", F ./ 2)
     return F
 end
 
