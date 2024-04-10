@@ -11,7 +11,6 @@ println("mission: ", mission)
 for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, order)
     para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, isFock=isFock, spin=spin)
     println(UEG.short(para))
-    # para = ParaMC(rs=_rs, beta=_beta, Fs=_F, order=_order, mass2=_mass2, isDynamic=isDynamic, dim=dim, isFock=isFock, spin=1)
     kF = para.kF
 
     if mission == "Z"
@@ -36,7 +35,7 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     for (order, sOrder, vOrder) in partition
         reweight_factor = 2.0^(2order + 2sOrder + vOrder - 2)
         if (order, sOrder, vOrder) == (1, 0, 0)
-            reweight_factor = 6.0
+            reweight_factor = 4.0
         end
         push!(reweight_goal, reweight_factor)
     end
