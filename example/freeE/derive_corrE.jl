@@ -4,8 +4,8 @@ using JLD2, DelimitedFiles
 include("../input.jl")
 
 if isLayered2D
-    const filename = "./data_freeE_layered2d.jld2"
-    const savefilename = "freeE_$(dim)d_layered2d.txt"
+    const filename = "./data_freeE_layered2d_sg.jld2"
+    const savefilename = "freeE_$(dim)d_layered2d.dat"
     const _parafilename = "para_wn_1minus0_layered2d.csv"
 else
     const filename = "./data$(dim)d_freeE.jld2"
@@ -23,19 +23,6 @@ function free_energy_0(para)
     else
         error("unknown dimension")
     end
-
-    # E0_data = []
-    # f = jldopen(filename, "r")
-    # open(filename_E0, "r") do io
-    #     append!(E0_data, readdlm(filename_E0))
-    # end
-    # idx = 0
-    # for i in 1:size(E0_data)[1]
-    #     if E0_data[i, 1:2] == [_rs, _beta]
-    #         idx = i
-    #         break
-    #     end
-    # end
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
