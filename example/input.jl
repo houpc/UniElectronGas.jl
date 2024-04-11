@@ -1,18 +1,18 @@
 # Use finalized lambda scans to determine mass2 for maximum orders N = 4, 5, 6
 include("lambda_scans.jl")
-dim = 3      # dimension of the problem
-rs = [6.0]
-order = [5]  # maximum diagram order of the run
+dim = 2      # dimension of the problem
+rs = [2.0]
+order = [4]  # maximum diagram order of the run
 mass2 = rs_to_lambdas[dim][order[1]][rs[1]]
 
 Fs = [-0.0]        # Fermi liquid parameter with zero angular momentum
-beta = [40.0]      # inverse temperature beta = β*E_F 
-neval = 1e11       # number of Monte Carlo samples
+beta = [50.0]      # inverse temperature beta = β*E_F 
+neval = 2e8       # number of Monte Carlo samples
 isDynamic = false  # whether to use effective field theory with dynamic screening or not 
 isFock = false     # whether to use Fock renormalization or not
 
 diagGenerate = :GV   # :GV or :Parquet, algorithm to generate diagrams
-isLayered2D = false  # whether to use layered 2D system or not
+isLayered2D = true  # whether to use layered 2D system or not
 
 spin = 2    # 2 for unpolarized, 1 for polarized
 # spin = 1    # 2 for unpolarized, 1 for polarized

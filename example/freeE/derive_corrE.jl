@@ -4,14 +4,16 @@ using JLD2, DelimitedFiles
 include("../input.jl")
 
 if isLayered2D
-    const filename = "./data_freeE_layered2d.jld2"
+    const filename = "./data_freeE_layered2d_sg.jld2"
+    const savefilename = "freeE_$(dim)d_layered2d.dat"
+    const _parafilename = "para_wn_1minus0_layered2d.csv"
 else
-    const filename = "./data_freeE.jld2"
+    const filename = "./data$(dim)d_freeE.jld2"
+    const savefilename = "freeE_$(dim)d.dat"
+    const _parafilename = "para_wn_1minus0.csv"
 end
-# const filename = "data$(dim)d_freeE.jld2"
 # const filename = "data3d/data$(dim)d_freeE.jld2"
 const filename_E0 = "E0_$(dim)d.txt"
-const savefilename = "freeE_$(dim)d.txt"
 
 function free_energy_0(para)
     if para.dim == 2
@@ -21,19 +23,6 @@ function free_energy_0(para)
     else
         error("unknown dimension")
     end
-
-    # E0_data = []
-    # f = jldopen(filename, "r")
-    # open(filename_E0, "r") do io
-    #     append!(E0_data, readdlm(filename_E0))
-    # end
-    # idx = 0
-    # for i in 1:size(E0_data)[1]
-    #     if E0_data[i, 1:2] == [_rs, _beta]
-    #         idx = i
-    #         break
-    #     end
-    # end
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
@@ -54,8 +43,8 @@ if abspath(PROGRAM_FILE) == @__FILE__
         if UEG.paraid(para) in paras
             println("working on ", UEG.paraid(para))
             energy0 = free_energy_0(para)
-            energy = UniElectronGas.getEnergy(para, filename, [energy0, 0.0]; parafile=parafilename)
-            push!(results, Any[_rs, _beta, _mass2, _order, spinPolarPara, energy...])
+            energy = UniElectronGas.getEnergy(para, filename, [energy0, 0.0]; parafile=_parafilename)
+            push!(results, Any[_rs, _beta, _mass2, _order, spin, energy...])
         else
             println("missing ", UEG.paraid(para), " in jld2 MC data file.")
         end

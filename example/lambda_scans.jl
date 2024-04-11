@@ -1,4 +1,4 @@
-const LambdaDictType = Dict{Float64, Vector{Float64}}
+const LambdaDictType = Dict{Float64,Vector{Float64}}
 
 # Finalized 3D lambda scans for maximum orders N = 4, 5, 6
 const rs_to_lambdas_3d_N4 = LambdaDictType(
@@ -22,7 +22,11 @@ const rs_to_lambdas_3d_N5 = LambdaDictType(
 const rs_to_lambdas_3d_N6 = LambdaDictType() # TODO: Add N = 6 3D lambda scans and datfile entries
 
 # TODO: Add N = 4, 5, 6 2D lambda scans and datfiles
-const rs_to_lambdas_2d_N4 = LambdaDictType()
+const rs_to_lambdas_2d_N4 = LambdaDictType(
+    #    1.0 => [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5],
+    1.0 => [0.2, 0.1, 0.05, 0.025, 0.0125, 0.0075, 0.0035],
+    2.0 => [0.4, 0.2, 0.1, 0.05, 0.025, 0.0125, 0.0075],
+)
 const rs_to_lambdas_2d_N5 = LambdaDictType()
 const rs_to_lambdas_2d_N6 = LambdaDictType()
 
