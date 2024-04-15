@@ -21,7 +21,7 @@ for (_rs, _mass2, _F, _beta, _order) in Iterators.product(rs, mass2, Fs, beta, o
     end
     push!(reweight_goal, 4.0)
 
-    filename = sigmadk_filename
+    filename = sigma_dk_filename
 
     # sigma, result = Sigma.MC_dk(para; kgrid=kgrid, ngrid=ngrid,
     sigma, result = Sigma.MC_dk_Clib(para; kgrid=kgrid, ngrid=ngrid,

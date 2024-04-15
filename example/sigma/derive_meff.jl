@@ -25,11 +25,11 @@ if abspath(PROGRAM_FILE) == @__FILE__
                     println(rSw_k[o])
                 end
 
-                # meff, fit_p = UniElectronGas.getMeff(para, rSw_k, kgrid, parafile=parafilename)
+                # meff, fit_p = UniElectronGas.getMeff(para, rSw_k, kgrid; parafile=parafilename)
                 # for idx_dk in 1:5
-                #     meff = UniElectronGas.getMeff(para, rSw_k, kgrid, idx_dk, parafile=parafilename)
+                #     meff = UniElectronGas.getMeff(para, rSw_k, kgrid, idx_dk; parafile=parafilename)
                 # end
-                meff = UniElectronGas.getMeff(para, rSw_k, kgrid, 2, parafile=parafilename)
+                meff = UniElectronGas.getMeff(para, rSw_k, kgrid, 2; parafile=parafilename)
                 println("m* / m = ", meff)
                 push!(results, Any[_rs, _beta, _mass2, _order, meff...])
                 # writedlm("fit.dat", fit_p)

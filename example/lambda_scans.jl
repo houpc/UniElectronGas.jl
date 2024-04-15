@@ -19,7 +19,9 @@ const rs_to_lambdas_3d_N5 = LambdaDictType(
     5.0 => [0.8125, 0.875, 0.9375, 1.0, 1.125],
     6.0 => [0.625, 0.75, 0.875, 1.0, 1.125, 1.25],
 )
-const rs_to_lambdas_3d_N6 = LambdaDictType() # TODO: Add N = 6 3D lambda scans and datfile entries
+const rs_to_lambdas_3d_N6 = LambdaDictType(
+    1.0 => [1.75],
+) # TODO: Add N = 6 3D lambda scans and datfile entries
 
 # TODO: Add N = 4, 5, 6 2D lambda scans and datfiles
 const rs_to_lambdas_2d_N4 = LambdaDictType(

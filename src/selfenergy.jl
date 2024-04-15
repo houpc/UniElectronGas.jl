@@ -202,6 +202,81 @@ function getZinv(para; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
     return @. 1.0 + sumzinv
 end
 
+# Extract the dispersion ratio ϵ_qp/ϵ_0 = 1 + δm from dΣ/dk
+function getDispersionRatio(para, rSigmadk; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    order, kF = para.order, para.kF
+    dMeffinv = -rSigmadk .* para.me / kF
+    println("dReΣ / dk = ", dMeffinv)
+
+    sumr = accumulate(+, dMeffinv)
+    return @. 1.0 + sumr
+end
+
+# Extract the inverse dispersion ratio ϵ_0/ϵ_qp = 1 / (1 + δm) from dΣ/dk
+function getDispersionRatioInv(para, rSigmadk; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    order, kF = para.order, para.kF
+    dMeffinv = -rSigmadk .* para.me / kF
+    println("dReΣ / dk = ", dMeffinv)
+
+    dispersion_ratio = Taylor1([1.0, dMeffinv...], order)
+    println("1 + (m / kF) dReΣ / dK = ", dispersion_ratio)
+
+    inverse_dispersion_ratio = 1 / dispersion_ratio
+    drinv = [TaylorSeries.getcoeff(inverse_dispersion_ratio, o) for o in 1:order]
+
+    sumrinv = accumulate(+, drinv)
+    return @. 1.0 + sumrinv
+end
+
+# Extract the effective mass from dΣ/dk
+function getMeff(para, rSigmadk; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    order, kF = para.order, para.kF
+
+    dMeffinv = -rSigmadk .* para.me / kF
+    # para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=para.order, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
+    # _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+    dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
+    zinv = Taylor1([1.0, dzinv...], order)
+    println("1 / z = ", zinv)
+
+    dispersion_ratio = Taylor1([1.0, dMeffinv...], order)
+    println("1 + (m / kF) dReΣ / dK = ", dispersion_ratio)
+
+    Meff = zinv / dispersion_ratio
+    dMeff = [TaylorSeries.getcoeff(Meff, o) for o in 1:order]
+    println("δm* / m = ", dMeff)
+
+    sumMeff = accumulate(+, dMeff)
+    return @. 1.0 + sumMeff
+    # return @. 1.0 + sumMeff
+end
+
+# Extract the inverse effective mass from dΣ/dk
+function getMeffInv(para, rSigmadk; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+    order, kF = para.order, para.kF
+
+    dMeffinv = -rSigmadk .* para.me / kF
+    # para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=para.order, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
+    # _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
+    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
+    dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
+    zinv = Taylor1([1.0, dzinv...], order)
+    println("1 / z = ", zinv)
+
+    dispersion_ratio = Taylor1([1.0, dMeffinv...], order)
+    println("1 + (m / kF) dReΣ / dK = ", dispersion_ratio)
+
+    MeffInv = zfactor * dispersion_ratio
+    dMeffInv = [getcoeff(MeffInv, o) for o in 1:order]
+
+    sumMeffInv = accumulate(+, dMeffInv)
+    return @. 1.0 + sumMeffInv
+end
+
+# Contains pre-AD dk getters
+module Deprecated
+
 # ϵ_qp/ϵ_0 = 1 + δm
 function getDispersionRatio(para, filename, idx_dk::Int=1; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
     order = para.order
@@ -286,7 +361,7 @@ function getDispersionRatioInv(para, rSigma, kgrid::Vector{Float64}; parafile="p
     return @. 1.0 + sumMeff, fit_parameters
 end
 
-function getMeff(para, rSigma, kgrid::Vector{Float64}, idx_dk::Int=1; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
+function getMeff(para, rSigma, kgrid::Vector{Float64}, idx_dk::Int; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
     order = para.order
     # ngrid, kgrid, rdata, idata = loaddata(para, filename)
     # _Meffinv = Dict()
@@ -417,25 +492,4 @@ function getMeffInv(para, rSigma, kgrid::Vector{Float64}; parafile="para_wn_1min
     return @. 1.0 + sumMeffInv, fit_parameters
 end
 
-# Extract the effective mass from dΣ/dk
-function getMeff(para, rSigmadk; parafile="para_wn_1minus0.csv", root_dir=@__DIR__)
-    order, kF = para.order, para.kF
-
-    dMeffinv = -rSigmadk .* para.me / kF
-    # para1 = ParaMC(rs=para.rs, beta=40.0, Fs=para.Fs, order=para.order, mass2=para.mass2, isDynamic=para.isDynamic, dim=para.dim, spin=para.spin)
-    # _mu, _zinv = CounterTerm.getSigma(para1, parafile=parafile, root_dir=root_dir)
-    _mu, _zinv = CounterTerm.getSigma(para, parafile=parafile, root_dir=root_dir)
-    dzinv, dmu, dz = CounterTerm.sigmaCT(para.order, _mu, _zinv)
-    zinv = Taylor1([1.0, dzinv...], order)
-    println("1 / z = ", zinv)
-
-    _Meffinv = Taylor1([1.0, dMeffinv...], order)
-    println("dReΣ / dk = ", _Meffinv)
-    Meff = zinv / _Meffinv
-    dMeff = [TaylorSeries.getcoeff(Meff, o) for o in 1:order]
-    println("δm* / m = ", dMeff)
-
-    sumMeff = accumulate(+, dMeff)
-    return @. 1.0 + sumMeff
-    # return @. 1.0 + sumMeff
 end
