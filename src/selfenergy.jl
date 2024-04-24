@@ -45,10 +45,8 @@ function meff_inverse(data, para, kgrid, i_dk=1, nidx=1)
 end
 
 function get_dzmu(para, datatuple; verbose=0,
-    # function get_dzmu(para, datatuple, datatuple1; verbose=0,
     parafile="para_wn_1minus0.csv", root_dir=@__DIR__, isSave=false)
     ngrid, kgrid, data = datatuple
-    # ngrid, kgrid, data1 = datatuple1
     printstyled(UEG.short(para), color=:yellow)
     println()
     @assert kgrid == [para.kF] "Function `get_dzmu` only supports kgrid = [para.kF]!"
@@ -56,12 +54,14 @@ function get_dzmu(para, datatuple; verbose=0,
 
     # Assumes the data are calculated with ngrid = [0], kgrid = [para.kF] or with ngrid = [-1, 0], kgrid = [para.kF]
     p1 = first(keys(data))
-    if size(data[p1], 1) == 1
+    # if size(data[p1], 1) == 1
+    if ngrid == [0]
         get_zfactor = (data, β) -> zfactor_inverse_single(data, β)
-        get_mu = data -> mu(data, 1, 1)
-    else
-        get_zfactor = (data, β) -> zfactor_inverse(data, β)
         get_mu = data -> mu(data)
+    elseif ngrid == [-1, 0]
+        get_zfactor = (data, β) -> zfactor_inverse_single(data, β, 2)
+        # get_zfactor = (data, β) -> zfactor_inverse(data, β)
+        get_mu = data -> mu(data, 2)
     end
 
     if verbose > 0
