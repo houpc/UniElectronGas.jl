@@ -1,10 +1,11 @@
 using ElectronLiquid, UniElectronGas
 using JLD2, DelimitedFiles
+using Measurements
 
 dim = 3
 spin = 2
 # rs = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
-rs = [3.0,]
+rs = [2.0,]
 # rs = [1.0, 2.0, 3.0, 4.0]
 # Fs = -[0.223, 0.380, 0.516, 0.639, 0.752]
 # Fs = -[0.223,]
@@ -13,7 +14,7 @@ rs = [3.0,]
 # mass2 = [1.0, 2.0, 3.0, 4.0, 5.0]
 # mass2 = [9.0, 13.0, 19.0, 27.0]
 # mass2 = [1e-3,]
-mass2 = [1.5,]
+mass2 = [2.0,]
 # mass2 = [2.44355,]
 # mass2 = [1.22177,]
 # mass2 = [0.814516,]
@@ -22,8 +23,8 @@ mass2 = [1.5,]
 # mass2 = [3.5,]
 # Fs = [-0.0,]
 Fs = -0.0 .* rs
-beta = [200.0]
-# beta = [100.0]
+# beta = [50,]
+beta = [100.0]
 order = [5,]
 # order = [2,]
 Nl = 1
@@ -32,10 +33,25 @@ isDynamic = false
 isFock = false
 ω_c = 0.1
 
+# mstar = [0.96537 ± 0.00011 0.95292 ± 0.00014 0.94942 ± 0.00016 0.94914 ± 0.0002 0.94954 ± 0.00034]
+# dmstar = -[(i == 0 ? 1.0 : mstar[i]) - mstar[i+1] for i in 0:length(mstar)-1]
+# dmstar = dmstar .* 0.0
+# 1.0
+dmstar = [0.965154 ± 3.5e-5 - 1.0, -0.012734 ± 2.6e-5, -0.003684 ± 2.6e-5, -1.7e-5 ± 3.3e-5, 0.000808 ± 5.4e-5]
+# 2.0
+dmstar = [0.971212 ± 3.6e-5 - 1.0, -0.013191 ± 3.4e-5, -0.006643 ± 3.8e-5, -0.00133 ± 5.3e-5, 0.00119 ± 0.0001]
+# 3.0
+# dmstar = [0.978121 ± 3.4e-5 - 1.0, -0.01011 ± 3.3e-5, -0.007079 ± 3.8e-5, -0.002236 ± 5.7e-5, 0.00094 ± 0.00012]
+# 4.0
+# dmstar = [0.977115 ± 3.9e-5 - 1.0, -0.006129 ± 3.9e-5, -0.005259 ± 5.1e-5, 0.000533 ± 9.1e-5, 0.00322 ± 0.00024]
+mstar = [1.0 + sum(dmstar[1:i]) for i in 1:length(dmstar)]
+
 const parafilename = "para_wn_1minus0.csv"
 # const filename = "data_ver4PP_profile.jld2"
 # const filename = "data_ver4PP_new.jld2"
 const filename = "data_ver4PP_parqAD.jld2"
+# const filename = "data_ver4PP_parqAD_rs1.jld2"
+# const filename = "data_ver4PP_parqAD_rs1_v5.jld2"
 # const filename = "data_ver4PP_parqAD_sugon.jld2"
 # const filename = "data_ver4PP_parqAD_newsamp.jld2"
 # const filename = "data_ver4PP_parqAD_newsamp_l10.jld2"
@@ -51,18 +67,30 @@ const filename = "data_ver4PP_parqAD.jld2"
 # const savefilename2 = "gayuk3_$(dim)d.dat"
 # const savefilename1 = "gsingyuk3_$(dim)d_01.dat"
 # const savefilename2 = "gtripyuk3_$(dim)d_01.dat"
-const savefilename1 = "gsingyuk3_$(dim)d_l10_01.dat"
-const savefilename2 = "gtripyuk3_$(dim)d_l10_01.dat"
+const savefilename1 = "gsingyuk3_$(dim)correctednomass_01.dat"
+const savefilename2 = "gtripyuk3_$(dim)correctednomass_01.dat"
 # const savefilename1 = "gsingrpa_$(dim)d.dat"
 # const savefilename2 = "gtriprpa_$(dim)d.dat"
 
+function shift_u(u, wc1, wc2)
+    # shift u from wc1 to wc2
+    return u ./ (1 .+ u .* log(wc1 / wc2))#, uerr ./ (1 .+ u .* log(wc1 / wc2)) .^ 2
+end
+
 function Πs(para; ω_c=0.1)
-    # return log(0.882 * ω_c * para.beta)
-    return log(ω_c * para.beta)
+    return log(0.882 * ω_c * para.beta)
+    # return log(ω_c * para.beta)
 end
 
 function Un(Γlist4, Π, n)
     Γlist = Γlist4 ./ 4
+    for i in 1:length(Γlist)
+        result = Γlist4[i] / 4
+        for j in 1:i-1
+            result += Γlist4[j] / 4 * dmstar[i-j]
+        end
+        Γlist[i] = result
+    end
     result = 0.0
     if n == 1
         result += Γlist[1]
@@ -77,12 +105,12 @@ function Un(Γlist4, Π, n)
         result += Γlist[1]
         result += Γlist[2] - Γlist[1]^2 * Π
         result += Γlist[3] - 2 * Γlist[1] * Π * Γlist[2] + Γlist[1]^3 * Π^2
-        result += Γlist[4] - 2 * Γlist[1] * Π * Γlist[3] + 3 * Γlist[1]^2 * Π^2 * Γlist[2] - Γlist[1]^4 * Π^3
+        result += Γlist[4] - 2 * Γlist[1] * Π * Γlist[3] - Γlist[2]^2 * Π + 3 * Γlist[1]^2 * Π^2 * Γlist[2] - Γlist[1]^4 * Π^3
     elseif n == 5
         result += Γlist[1]
         result += Γlist[2] - Γlist[1]^2 * Π
         result += Γlist[3] - 2 * Γlist[1] * Π * Γlist[2] + Γlist[1]^3 * Π^2
-        result += Γlist[4] - 2 * Γlist[1] * Π * Γlist[3] + 3 * Γlist[1]^2 * Π^2 * Γlist[2] - Γlist[1]^4 * Π^3
+        result += Γlist[4] - 2 * Γlist[1] * Π * Γlist[3] - Γlist[2]^2 * Π + 3 * Γlist[1]^2 * Π^2 * Γlist[2] - Γlist[1]^4 * Π^3
         result += (Γlist[5] - 2 * (Γlist[1] * Π * Γlist[4] + Γlist[2] * Π * Γlist[3])
                    +
                    3 * (Γlist[1]^2 * Π^2 * Γlist[3] + Γlist[2]^2 * Π^2 * Γlist[1])
@@ -92,7 +120,7 @@ function Un(Γlist4, Π, n)
         result += Γlist[1]
         result += Γlist[2] - Γlist[1]^2 * Π
         result += Γlist[3] - 2 * Γlist[1] * Π * Γlist[2] + Γlist[1]^3 * Π^2
-        result += Γlist[4] - 2 * Γlist[1] * Π * Γlist[3] + 3 * Γlist[1]^2 * Π^2 * Γlist[2] - Γlist[1]^4 * Π^3
+        result += Γlist[4] - 2 * Γlist[1] * Π * Γlist[3] - Γlist[2]^2 * Π + 3 * Γlist[1]^2 * Π^2 * Γlist[2] - Γlist[1]^4 * Π^3
         result += (Γlist[5] - 2 * (Γlist[1] * Π * Γlist[4] + Γlist[2] * Π * Γlist[3])
                    +
                    3 * (Γlist[1]^2 * Π^2 * Γlist[3] + Γlist[2]^2 * Π^2 * Γlist[1])
