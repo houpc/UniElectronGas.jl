@@ -13,7 +13,7 @@ isDynamic = false  # whether to use effective field theory with dynamic screenin
 isFock = false     # whether to use Fock renormalization or not
 
 diagGenerate = :GV   # :GV or :Parquet, algorithm to generate diagrams
-isLayered2D = false  # whether to use layered 2D system or not
+isLayered2D = true  # whether to use layered 2D system or not
 
 spin = 2    # 2 for unpolarized, 1 for polarized
 # spin = 1    # 2 for unpolarized, 1 for polarized
