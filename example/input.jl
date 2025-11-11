@@ -1,8 +1,10 @@
 # Use finalized lambda scans to determine mass2 for maximum orders N = 4, 5, 6
 include("lambda_scans.jl")
 dim = 3      # dimension of the problem
-rs = [0.5]
-order = [5]                         # maximum diagram order for Σ diagrams (K and dK missions)
+rs = [1.0]
+order = [6]                         # maximum diagram order for Σ diagrams (K and dK missions)
+# rs = [0.5]
+# order = [5]                         # maximum diagram order for Σ diagrams (K and dK missions)
 mass2 = rs_to_lambdas[dim][order[1]][rs[1]]
 
 Fs = [-0.0]        # Fermi liquid parameter with zero angular momentum
@@ -31,6 +33,7 @@ basenames = [
     "data$(dim)d_Z",
     "data$(dim)d_K",
     "data$(dim)d_dk",
+    "meff_estimates_$(dim)d",
     "meff_dk_$(dim)d",
     "inverse_meff_dk_$(dim)d",
     "zfactor_$(dim)d",
@@ -59,6 +62,7 @@ para_basename,
 sigma_z_basename,
 sigma_k_basename,
 sigma_dk_basename,
+meff_estimates_basename,
 meff_dk_basename,
 inverse_meff_dk_basename,
 zfactor_basename,
@@ -83,6 +87,7 @@ const parafilename = joinpath(para_directory, para_basename * ".csv")
 const sigma_z_filename = joinpath(data_directory, sigma_z_basename * ".jld2")
 const sigma_k_filename = joinpath(data_directory, sigma_k_basename * ".jld2")
 const sigma_dk_filename = joinpath(data_directory, sigma_dk_basename * ".jld2")
+const meff_estimates_filename = joinpath(res_directory, meff_estimates_basename * ".dat")
 const meff_dk_filename = joinpath(res_directory, meff_dk_basename * ".dat")
 const inverse_meff_dk_filename = joinpath(res_directory, inverse_meff_dk_basename * ".dat")
 const zfactor_filename = joinpath(res_directory, zfactor_basename * ".dat")
