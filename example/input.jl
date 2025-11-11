@@ -1,19 +1,18 @@
 # Use finalized lambda scans to determine mass2 for maximum orders N = 4, 5, 6
 include("lambda_scans.jl")
 dim = 3      # dimension of the problem
-rs = [1.0]
-order = [6]                         # maximum diagram order for Σ diagrams (K and dK missions)
+rs = [0.5]
+order = [5]                         # maximum diagram order for Σ diagrams (K and dK missions)
 mass2 = rs_to_lambdas[dim][order[1]][rs[1]]
-# mass2 = [1.75]
 
 Fs = [-0.0]        # Fermi liquid parameter with zero angular momentum
 beta = [40.0]      # inverse temperature beta = β*E_F 
-neval = 1e10       # number of Monte Carlo samples
+neval = 1e9       # number of Monte Carlo samples
 isDynamic = false  # whether to use effective field theory with dynamic screening or not 
 isFock = false     # whether to use Fock renormalization or not
 
 diagGenerate = :GV   # :GV or :Parquet, algorithm to generate diagrams
-isLayered2D = true  # whether to use layered 2D system or not
+isLayered2D = false  # whether to use layered 2D system or not
 
 spin = 2    # 2 for unpolarized, 1 for polarized
 # spin = 1    # 2 for unpolarized, 1 for polarized
@@ -24,7 +23,7 @@ println("rs = $rs, mass2 = $mass2, order = $order, neval = $neval")
 
 # Build file base names
 basenames = [
-    "meff_$(dim)d",
+    # "meff_$(dim)d",
     # "inverse_meff_$(dim)d",
     # "dispersion_ratio_$(dim)d",
     # "inverse_dispersion_ratio_$(dim)d",
@@ -52,7 +51,7 @@ for i in eachindex(basenames)
         basenames[i] *= "_layered2d"
     end
 end
-meff_basename,
+# meff_basename,
 # inverse_meff_basename,
 # dispersion_ratio_basename,
 # inverse_dispersion_ratio_basename,
@@ -74,7 +73,7 @@ res_directory = joinpath(@__DIR__, "sigma")
 para_directory = ""  # src directory
 
 # # Old file paths (no AD for k derivative)
-const meff_filename = joinpath(res_directory, meff_basename * ".dat")
+# const meff_filename = joinpath(res_directory, meff_basename * ".dat")
 # const inverse_meff_filename = joinpath(res_directory, inverse_meff_basename * ".dat")
 # const dispersion_ratio_filename = joinpath(res_directory, dispersion_ratio_basename * ".dat")
 # const inverse_dispersion_ratio_filename = joinpath(res_directory, inverse_dispersion_ratio_basename * ".dat")
